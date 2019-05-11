@@ -1,0 +1,52 @@
+{
+  "name": "gcode-viewer",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "react-scripts": "3.0.1",
+    "d3": "^5.9.1",
+    "formik": "^1.5.0",
+    "mobx": "^5.9.0",
+    "mobx-react": "^5.4.3",
+    "normalize.css": "^8.0.1",
+    "styled-components": "^4.1.3",
+    "xstate": "^4.3.1",
+    "yup": "^0.26.10"
+  },
+  "devDependencies": {
+    "@blueprintjs/core": "^3.13.0",
+    "@types/d3": "^5.7.0",
+    "@types/jest": "^24.0.12",
+    "@types/react": "16.8.2",
+    "@types/react-dom": "16.8.0",
+    "@types/styled-components": "^4.1.6",
+    "@types/yup": "^0.26.9",
+    "mobx-react-devtools": "^6.0.3",
+    "mobx-react-lite": "^1.0.0",
+    "prettier": "^1.16.1",
+    "typescript": "^3.3.3"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
