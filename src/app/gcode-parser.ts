@@ -1,11 +1,12 @@
 interface IMinMax {
-  min: number | null;
-  max: number | null;
+  min: number;
+  max: number;
 }
 export interface IStatistics {
   x: IMinMax;
   y: IMinMax;
   feed_rate: IMinMax;
+  extruded_feed_rate: IMinMax;
 }
 
 const STATE_NONE = 0;
@@ -37,7 +38,7 @@ export const COMMANDS = {
   MOVE_WITHOUT_EXTRUSION: 2, // parameters: X,Y
   SET_FEED_RATE: 3, // parameters: F
   RETRACTION: 4,
-  LAYER_CHANGE: 5, // parameters: Z
+  LAYER_CHANGE: 5 // parameters: Z
 };
 
 const INSTRUCTION_ARRAY_BLOCK_SIZE = 1024 * 256 * 3; // a multiple of the instruction size (3 * 4 byte)
@@ -60,6 +61,7 @@ export default class GCodeParser {
   // for layer change detection
   prev_z: number = 0;
   last_z_with_extrusion: number | undefined;
+  last_feed_rate_with_extrusion: number | undefined;
   current_layer_index = 0;
   layer_positions: number[] = [];
 
@@ -77,6 +79,25 @@ export default class GCodeParser {
   constructor() {
     this.field_values.fill(NaN);
   }
+
+  statistics = {
+    x: {
+      min: Infinity,
+      max: -Infinity
+    },
+    y: {
+      min: Infinity,
+      max: -Infinity
+    },
+    feed_rate: {
+      min: Infinity,
+      max: -Infinity
+    },
+    extruded_feed_rate: {
+      min: Infinity,
+      max: -Infinity
+    }
+  };
 
   parse(gcodeArrayBuffer: ArrayBuffer) {
     const data = new Uint8Array(gcodeArrayBuffer);
@@ -194,6 +215,13 @@ export default class GCodeParser {
 
                   command = COMMANDS.MOVE_WITH_EXTRUSION;
                   this.last_z_with_extrusion = this.prev_z;
+                  if (this.feed_rate !== this.last_feed_rate_with_extrusion) {
+                    if (this.feed_rate > this.statistics.extruded_feed_rate.max)
+                      this.statistics.extruded_feed_rate.max = this.feed_rate;
+                    if (this.feed_rate < this.statistics.extruded_feed_rate.min)
+                      this.statistics.extruded_feed_rate.min = this.feed_rate;
+                  }
+                  this.last_feed_rate_with_extrusion = this.feed_rate;
                 } else {
                   command = COMMANDS.MOVE_WITHOUT_EXTRUSION;
                 }
@@ -203,6 +231,10 @@ export default class GCodeParser {
                   if (this.axis_coordinates_absolute)
                     x_coord = this.field_values[X];
                   else x_coord = this.prev_x + this.field_values[X];
+                  if (x_coord > this.statistics.x.max)
+                    this.statistics.x.max = x_coord;
+                  if (x_coord < this.statistics.x.min)
+                    this.statistics.x.min = x_coord;
                 } else x_coord = this.prev_x;
 
                 // Set Y value for move command
@@ -210,6 +242,10 @@ export default class GCodeParser {
                   if (this.axis_coordinates_absolute)
                     y_coord = this.field_values[Y];
                   else y_coord = this.prev_y + this.field_values[Y];
+                  if (y_coord > this.statistics.y.max)
+                    this.statistics.y.max = y_coord;
+                  if (y_coord < this.statistics.y.min)
+                    this.statistics.y.min = y_coord;
                 } else y_coord = this.prev_y;
                 this.instructions.addInstruction(command, x_coord, y_coord);
                 this.line_index.push(this.byte_index);
@@ -224,6 +260,10 @@ export default class GCodeParser {
                   COMMANDS.SET_FEED_RATE,
                   this.field_values[F]
                 );
+                if (this.feed_rate > this.statistics.feed_rate.max)
+                  this.statistics.feed_rate.max = this.feed_rate;
+                if (this.feed_rate < this.statistics.feed_rate.min)
+                  this.statistics.feed_rate.min = this.feed_rate;
                 this.line_index.push(this.byte_index);
               }
 
@@ -301,12 +341,8 @@ export default class GCodeParser {
     return {
       instructions: this.instructions,
       layerPositions: this.layer_positions,
-      statistics: {
-        x: { min: 0, max: 100 },
-        y: { min: 0, max: 100 },
-        feed_rate: { min: 0, max: 8000 },
-      },
-      lineIndex: this.line_index,
+      statistics: this.statistics,
+      lineIndex: this.line_index
     };
   }
 }

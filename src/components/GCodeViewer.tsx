@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Instructions, COMMANDS } from "app/gcode-parser";
+import { Instructions, COMMANDS, IStatistics } from "app/gcode-parser";
 import { zoom, zoomIdentity } from "d3-zoom";
 import { select, event, TransitionLike } from "d3-selection";
 import { scaleLinear } from "d3-scale";
@@ -38,7 +38,7 @@ const GCodeViewer = observer(
     activeGCode,
     transform,
     setTransform,
-    drawSettings,
+    drawSettings
   }: IProps) => {
     const [context, setContext] = useState<CanvasRenderingContext2D | null>(
       null
@@ -71,7 +71,8 @@ const GCodeViewer = observer(
         activeGCode.instructions,
         transform,
         devicePixelRatio,
-        drawSettings
+        drawSettings,
+        activeGCode.statistics
       );
     }
 
@@ -130,11 +131,15 @@ function drawInstructions(
   instructions: Instructions,
   transform: any,
   devicePixelRatio: number,
-  drawSettings: IDrawSettings
+  drawSettings: IDrawSettings,
+  statistics: IStatistics
 ) {
   const feedRateScale = scaleLinear()
-    .domain([900, 11054.3])
-    .range([0, 0.75]);
+    .domain([
+      statistics.extruded_feed_rate.min,
+      statistics.extruded_feed_rate.max
+    ])
+    .range([0, 0.8]);
 
   let prevX = 0;
   let prevY = 0;
