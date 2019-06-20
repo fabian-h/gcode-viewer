@@ -1,8 +1,8 @@
 import * as React from "react";
-import { UIStore, IGCode } from "app/UIStore";
+import { UIStore } from "app/UIStore";
 import GCodeViewer from "./GCodeViewer";
-import { toJS } from "mobx";
 import { observer } from "mobx-react";
+import { GCodeDropzone } from "./GCodeDropzone";
 
 interface IProps {
   UIStore: UIStore;
@@ -10,13 +10,7 @@ interface IProps {
 
 const StaticGCodeViewer = observer(
   ({
-    UIStore: {
-      activeGCode,
-      activeLayer,
-      transform,
-      setTransform,
-      drawSettings,
-    },
+    UIStore: { activeGCode, activeLayer, transform, setTransform, drawSettings }
   }: IProps) => {
     if (activeGCode) {
       return (
@@ -29,7 +23,7 @@ const StaticGCodeViewer = observer(
           drawSettings={drawSettings}
         />
       );
-    } else return <div>No GCode</div>;
+    } else return GCodeDropzone();
   }
 );
 export default StaticGCodeViewer;
