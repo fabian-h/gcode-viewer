@@ -14,13 +14,11 @@ import {
 
 import styled from "styled-components";
 import { Slider } from "@blueprintjs/core";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import UIStore from "app/UIStore";
 //import DevTools from "mobx-react-devtools";
 
-import GCodeUpload from "./GCodeUpload";
 import OctoprintAddDialog from "./octoprint/OctoprintAddDialog";
-import OctoprintSidebar from "./octoprint/OctoprintSidebar";
 import LiveGCodeViewer from "./LiveGCodeViewer";
 import StaticGCodeViewer from "./StaticGCodeViewer";
 import DrawSettingsButton from "./DrawSettings";
@@ -87,9 +85,7 @@ const App = observer(IProps => {
           </Navbar.Group>
         </Navbar>
       </TopbarContainer>
-      <SidebarContainer>
-        <OctoprintSidebar />
-      </SidebarContainer>
+
       <ViewerContainer>
         {UIStore.trackProgress ? (
           <LiveGCodeViewer UIStore={UIStore} />
@@ -109,7 +105,6 @@ const App = observer(IProps => {
             labelStepSize={Math.ceil(1 + UIStore.numberOfLayers / 200) * 10}
             onChange={n => UIStore.setActiveLayer(n)}
           />
-          <GCodeUpload />
         </FormGroup>
       </ToolContainer>
     </GridContainer>

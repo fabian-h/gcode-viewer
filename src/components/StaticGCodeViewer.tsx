@@ -1,7 +1,7 @@
 import * as React from "react";
 import { UIStore } from "app/UIStore";
 import GCodeViewer from "./GCodeViewer";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 import { GCodeDropzone } from "./GCodeDropzone";
 
 interface IProps {
@@ -23,7 +23,7 @@ const StaticGCodeViewer = observer(
           drawSettings={drawSettings}
         />
       );
-    } else return GCodeDropzone();
+    } else return <GCodeDropzone />;
   }
 );
 export default StaticGCodeViewer;

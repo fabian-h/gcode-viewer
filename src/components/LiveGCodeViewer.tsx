@@ -2,7 +2,7 @@ import * as React from "react";
 import { UIStore, IGCode } from "app/UIStore";
 import GCodeViewer from "./GCodeViewer";
 import { toJS } from "mobx";
-import { observer } from "mobx-react";
+import { observer } from "mobx-react-lite";
 
 interface IProps {
   UIStore: UIStore;
@@ -10,7 +10,7 @@ interface IProps {
 
 const LiveGCodeViewer = observer(
   ({
-    UIStore: { activeGCode, transform, setTransform, drawSettings },
+    UIStore: { activeGCode, transform, setTransform, drawSettings }
   }: IProps) => {
     if (
       activeGCode &&

@@ -9,7 +9,6 @@ import styled from "styled-components";
 import { IGCode, IDrawSettings } from "app/UIStore";
 import { toJS, action, set } from "mobx";
 import { useState, useEffect, createRef, useRef } from "react";
-import ReactDOM from "react-dom";
 import { ResizeSensor } from "@blueprintjs/core";
 
 const StyledCanvas = styled.canvas`
