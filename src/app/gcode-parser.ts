@@ -72,7 +72,7 @@ export default class GCodeParser {
   instructions = new Instructions(1024 * 16);
 
   byte_index = 0;
-  line_index: number[] = [];
+  //line_index: number[] = [];
 
   last_block: Uint8Array | undefined;
 
@@ -206,7 +206,7 @@ export default class GCodeParser {
                       COMMANDS.LAYER_CHANGE,
                       this.prev_z
                     );
-                    this.line_index.push(this.byte_index);
+                    //this.line_index.push(this.byte_index);
                     this.layer_positions.push(
                       this.instructions.totalInstructions
                     );
@@ -248,7 +248,7 @@ export default class GCodeParser {
                     this.statistics.y.min = y_coord;
                 } else y_coord = this.prev_y;
                 this.instructions.addInstruction(command, x_coord, y_coord);
-                this.line_index.push(this.byte_index);
+                //this.line_index.push(this.byte_index);
                 this.prev_x = x_coord;
                 this.prev_y = y_coord;
               }
@@ -264,13 +264,13 @@ export default class GCodeParser {
                   this.statistics.feed_rate.max = this.feed_rate;
                 if (this.feed_rate < this.statistics.feed_rate.min)
                   this.statistics.feed_rate.min = this.feed_rate;
-                this.line_index.push(this.byte_index);
+                //this.line_index.push(this.byte_index);
               }
 
               if (!isNaN(this.field_values[Z])) {
                 if (this.field_values[Z] > this.prev_z) {
                   this.instructions.addInstruction(COMMANDS.RETRACTION);
-                  this.line_index.push(this.byte_index);
+                  //this.line_index.push(this.byte_index);
                 }
                 this.prev_z = this.field_values[Z];
               }
@@ -342,7 +342,7 @@ export default class GCodeParser {
       instructions: this.instructions,
       layerPositions: this.layer_positions,
       statistics: this.statistics,
-      lineIndex: this.line_index
+      lineIndex: [] //this.line_index
     };
   }
 }
