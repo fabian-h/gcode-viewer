@@ -49,7 +49,7 @@ const SidebarContainer = styled.div`
 `;
 
 const ViewerContainer = styled.div`
-  grid-column: 2/3;
+  grid-column: 1/3;
   grid-row: 2;
   background: white;
   display: flex;
@@ -94,18 +94,20 @@ const App = observer(IProps => {
         )}
       </ViewerContainer>
       <ToolContainer>
-        <FormGroup label="Active layer">
-          <Slider
-            value={UIStore.activeLayer}
-            min={0}
-            max={
-              UIStore.numberOfLayers !== 0 ? UIStore.numberOfLayers - 2 : 100
-            }
-            disabled={UIStore.numberOfLayers === 0}
-            labelStepSize={Math.ceil(1 + UIStore.numberOfLayers / 200) * 10}
-            onChange={n => UIStore.setActiveLayer(n)}
-          />
-        </FormGroup>
+        {UIStore.activeGCode ? (
+          <FormGroup label="Current layer">
+            <Slider
+              value={UIStore.activeLayer}
+              min={1}
+              max={
+                UIStore.numberOfLayers !== 0 ? UIStore.numberOfLayers - 2 : 100
+              }
+              disabled={UIStore.numberOfLayers === 0}
+              labelStepSize={Math.ceil(1 + UIStore.numberOfLayers / 200) * 10}
+              onChange={n => UIStore.setActiveLayer(n)}
+            />
+          </FormGroup>
+        ) : null}
       </ToolContainer>
     </GridContainer>
     //</React.StrictMode>

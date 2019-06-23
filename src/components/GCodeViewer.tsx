@@ -108,16 +108,12 @@ const GCodeViewer = observer(
       }
     });
 
+    var tmp = drawSettings.lineWidth;
+
     return (
-      <>
-        <ResizeSensor onResize={handleResize}>
-          <StyledCanvas ref={canvas} />
-        </ResizeSensor>
-        <div>
-          {drawSettings.lineWidth}
-          {transform.x}
-        </div>
-      </>
+      <ResizeSensor onResize={handleResize}>
+        <StyledCanvas ref={canvas} />
+      </ResizeSensor>
     );
   }
 );

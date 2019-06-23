@@ -15,7 +15,7 @@ export class UIStore {
 
   @observable
   drawSettings: IDrawSettings = {
-    lineWidth: 1,
+    lineWidth: 2
   };
 
   @action.bound
@@ -40,8 +40,6 @@ export class UIStore {
 
   @action
   setActiveGCode(gcode: IGCode | null) {
-    console.log("G", gcode);
-
     /*if (gcode) {
       this.setTransform({
         k: 3,
@@ -50,6 +48,7 @@ export class UIStore {
       });
     }*/
     this.activeGCode = gcode;
+    this.activeLayer = 1;
   }
 
   @observable.ref
