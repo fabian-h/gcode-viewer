@@ -211,6 +211,14 @@ export default class GCodeParser {
                       this.instructions.totalInstructions
                     );
                     this.current_layer_index += 1;
+
+                    // set all relevant parameters at the start of each layer
+                    // so that each layer contains all necessary information
+                    // for displaying it
+                    this.instructions.addInstruction(
+                      COMMANDS.SET_FEED_RATE,
+                      this.feed_rate,
+                    );
                   }
 
                   command = COMMANDS.MOVE_WITH_EXTRUSION;
