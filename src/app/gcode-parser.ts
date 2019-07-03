@@ -216,8 +216,13 @@ export default class GCodeParser {
                     // so that each layer contains all necessary information
                     // for displaying it
                     this.instructions.addInstruction(
+                      COMMANDS.MOVE_WITHOUT_EXTRUSION,
+                      this.prev_x,
+                      this.prev_y
+                    );
+                    this.instructions.addInstruction(
                       COMMANDS.SET_FEED_RATE,
-                      this.feed_rate,
+                      this.feed_rate
                     );
                   }
 
