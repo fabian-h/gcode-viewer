@@ -1,5 +1,6 @@
 {
   "name": "gcode-viewer",
+  "homepage": "https://fabian-h.github.io/gcode-viewer",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
