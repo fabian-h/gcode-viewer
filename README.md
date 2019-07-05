@@ -2,6 +2,10 @@ Prototype for a G-Code viewer for 3D printing in the browser. Designed for speed
 
 You need npm or yarn to build the G-Code viewer.
 
+## Live demo
+
+https://fabian-h.github.io/gcode-viewer/
+
 ## Development
 
     yarn
