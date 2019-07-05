@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License. 
 */
 
-import { observable, action, computed, set, get, spy } from "mobx";
+import { observable, action, computed } from "mobx";
 import { Instructions, IStatistics } from "./gcode-parser";
 import { ITransform } from "components/GCodeViewer";
 import OctoprintConnection from "./OctoprintConnection";

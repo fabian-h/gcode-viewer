@@ -16,15 +16,15 @@ limitations under the License.
 
 import * as React from "react";
 import { Instructions, COMMANDS, IStatistics } from "app/gcode-parser";
-import { zoom, zoomIdentity } from "d3-zoom";
-import { select, event, TransitionLike } from "d3-selection";
+import { zoom } from "d3-zoom";
+import { select, event } from "d3-selection";
 import { scaleLinear } from "d3-scale";
 import { interpolateInferno } from "d3-scale-chromatic";
 import { observer } from "mobx-react-lite";
 import styled from "styled-components";
 import { IGCode, IDrawSettings } from "app/UIStore";
-import { toJS, action, set } from "mobx";
-import { useState, useEffect, createRef, useRef } from "react";
+import { action } from "mobx";
+import { useState, useEffect, useRef } from "react";
 import { ResizeSensor } from "@blueprintjs/core";
 
 const StyledCanvas = styled.canvas`
@@ -77,7 +77,7 @@ const GCodeViewer = observer(
       if (canvas.current === null || context === null || activeGCode === null) {
         return;
       }
-      const x = drawSettings.lineWidth;
+
       clearCanvas(canvas.current, context);
       drawInstructions(
         context,
@@ -124,6 +124,7 @@ const GCodeViewer = observer(
       }
     });
 
+    // hack to get mobx to notice we use this Observable
     var tmp = drawSettings.lineWidth;
 
     return (

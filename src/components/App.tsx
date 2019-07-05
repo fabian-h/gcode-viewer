@@ -14,27 +14,19 @@ See the License for the specific language governing permissions and
 limitations under the License. 
 */
 
-import { FocusStyleManager, Dialog } from "@blueprintjs/core";
+import { FocusStyleManager } from "@blueprintjs/core";
 
 import "normalize.css/normalize.css";
 import "@blueprintjs/core/lib/css/blueprint.css";
 
 import * as React from "react";
-import {
-  Button,
-  FileInput,
-  FormGroup,
-  Navbar,
-  Alignment
-} from "@blueprintjs/core";
+import { FormGroup, Navbar, Alignment } from "@blueprintjs/core";
 
 import styled from "styled-components";
 import { Slider } from "@blueprintjs/core";
 import { observer } from "mobx-react-lite";
 import UIStore from "app/UIStore";
-//import DevTools from "mobx-react-devtools";
 
-import OctoprintAddDialog from "./octoprint/OctoprintAddDialog";
 import LiveGCodeViewer from "./LiveGCodeViewer";
 import StaticGCodeViewer from "./StaticGCodeViewer";
 import DrawSettingsButton from "./DrawSettings";
@@ -59,11 +51,6 @@ const TopbarContainer = styled.div`
   gap: 0;
 `;
 
-const SidebarContainer = styled.div`
-  grid-column: 1/2;
-  grid-row: 2;
-`;
-
 const ViewerContainer = styled.div`
   grid-column: 1/3;
   grid-row: 2;
@@ -86,14 +73,9 @@ const App = observer(IProps => {
       <TopbarContainer>
         <Navbar className="bp3-dark">
           <Navbar.Group align={Alignment.LEFT}>
-            <Navbar.Heading>GCode Viewer</Navbar.Heading>
+            <Navbar.Heading>G-Code viewer for 3D printing</Navbar.Heading>
             <Navbar.Divider />
-            <Button
-              className="bp3-minimal"
-              icon="document"
-              text="Add GCode file"
-            />
-            <OctoprintAddDialog />
+
             <DrawSettingsButton
               drawSettings={UIStore.drawSettings}
               setDrawSetting={UIStore.setDrawSetting}
@@ -109,8 +91,8 @@ const App = observer(IProps => {
           <StaticGCodeViewer UIStore={UIStore} />
         )}
       </ViewerContainer>
-      <ToolContainer>
-        {UIStore.activeGCode ? (
+      {UIStore.activeGCode ? (
+        <ToolContainer>
           <FormGroup label="Current layer">
             <Slider
               value={UIStore.activeLayer}
@@ -123,8 +105,8 @@ const App = observer(IProps => {
               onChange={n => UIStore.setActiveLayer(n)}
             />
           </FormGroup>
-        ) : null}
-      </ToolContainer>
+        </ToolContainer>
+      ) : null}
     </GridContainer>
     //</React.StrictMode>
   );

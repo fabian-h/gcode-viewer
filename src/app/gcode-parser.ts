@@ -33,6 +33,7 @@ const E = 4;
 const F = 5;
 const G = 6;
 const M = 12;
+const T = 19;
 const X = 23;
 const Y = 24;
 const Z = 25;
@@ -54,10 +55,11 @@ export const COMMANDS = {
   MOVE_WITHOUT_EXTRUSION: 2, // parameters: X,Y
   SET_FEED_RATE: 3, // parameters: F
   RETRACTION: 4,
-  LAYER_CHANGE: 5 // parameters: Z
+  LAYER_CHANGE: 5, // parameters: Z
+  TOOL_CHANGE: 6
 };
 
-const INSTRUCTION_ARRAY_BLOCK_SIZE = 1024 * 256 * 3; // a multiple of the instruction size (3 * 4 byte)
+const INSTRUCTION_ARRAY_BLOCK_SIZE = 1024 * 32;
 
 const LOOKUP_BEFORE_DOT = [1, 10, 100, 1000, 10000, 100000, 1000000];
 const LOOKUP_AFTER_DOT = [0.1, 0.01, 0.001, 0.0001, 0.00001, 0.000001];
@@ -73,6 +75,7 @@ export default class GCodeParser {
   axis_coordinates_absolute = true;
   extruder_coordinates_absolute = false;
   feed_rate = 0;
+  current_tool = 0;
 
   // for layer change detection
   prev_z: number = 0;
@@ -85,7 +88,7 @@ export default class GCodeParser {
   prev_y = 0;
   prev_e = 0;
 
-  instructions = new Instructions(1024 * 16);
+  instructions = new Instructions(INSTRUCTION_ARRAY_BLOCK_SIZE);
 
   byte_index = 0;
   //line_index: number[] = [];
@@ -323,6 +326,12 @@ export default class GCodeParser {
               this.extruder_coordinates_absolute = false;
               break;
           }
+        } else if (!isNaN(this.field_values[T])) {
+          this.instructions.addInstruction(
+            COMMANDS.TOOL_CHANGE,
+            this.field_values[T]
+          );
+          this.current_tool = this.field_values[T];
         }
 
         // reset all fields to NaN so that we don't use fields defined

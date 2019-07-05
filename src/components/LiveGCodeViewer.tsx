@@ -17,7 +17,6 @@ limitations under the License.
 import * as React from "react";
 import { UIStore, IGCode } from "app/UIStore";
 import GCodeViewer from "./GCodeViewer";
-import { toJS } from "mobx";
 import { observer } from "mobx-react-lite";
 
 interface IProps {
