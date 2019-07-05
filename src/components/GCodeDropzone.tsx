@@ -35,13 +35,16 @@ const DropzoneContainer = styled.div`
   color: #333;
 `;
 
-export function GCodeDropzone() {
+interface IProps {
+  onFileLoad: () => void;
+}
+
+export function GCodeDropzone({ onFileLoad }: IProps) {
   const onDrop = useCallback(async acceptedFiles => {
-    // Do something with the files
-    console.log(acceptedFiles);
+    UIStore.setActiveGCode(null);
     const gcode = await uploadGCodeFiles(acceptedFiles);
-    console.log("FINISHED", gcode);
     UIStore.setActiveGCode(gcode);
+    if (onFileLoad) onFileLoad();
   }, []);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
 

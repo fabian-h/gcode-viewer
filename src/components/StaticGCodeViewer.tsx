@@ -19,27 +19,45 @@ import { UIStore } from "app/UIStore";
 import GCodeViewer from "./GCodeViewer";
 import { observer } from "mobx-react-lite";
 import { GCodeDropzone } from "./GCodeDropzone";
+import { useState } from "react";
+import styled from "styled-components";
 
 interface IProps {
   UIStore: UIStore;
 }
+const StyledDiv = styled.div`
+  flex: 1;
+  display: flex;
+`;
 
 const StaticGCodeViewer = observer(
   ({
     UIStore: { activeGCode, activeLayer, transform, setTransform, drawSettings }
   }: IProps) => {
-    if (activeGCode) {
+    const [isDragging, setDragging] = useState<boolean>(false);
+
+    function handleDragOver(e: any) {
+      setDragging(true);
+    }
+
+    function handleDragLeave(e: any) {
+      setDragging(false);
+    }
+
+    if (activeGCode && !isDragging) {
       return (
-        <GCodeViewer
-          from={activeGCode.layerPositions[activeLayer]}
-          to={activeGCode.layerPositions[activeLayer + 1]}
-          activeGCode={activeGCode}
-          transform={transform}
-          setTransform={setTransform}
-          drawSettings={drawSettings}
-        />
+        <StyledDiv onDragOver={handleDragOver} onDragLeave={handleDragLeave}>
+          <GCodeViewer
+            from={activeGCode.layerPositions[activeLayer]}
+            to={activeGCode.layerPositions[activeLayer + 1]}
+            activeGCode={activeGCode}
+            transform={transform}
+            setTransform={setTransform}
+            drawSettings={drawSettings}
+          />
+        </StyledDiv>
       );
-    } else return <GCodeDropzone />;
+    } else return <GCodeDropzone onFileLoad={() => setDragging(false)} />;
   }
 );
 export default StaticGCodeViewer;
