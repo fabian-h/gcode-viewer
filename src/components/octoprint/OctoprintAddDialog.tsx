@@ -1,3 +1,19 @@
+/* 
+Copyright 2019 Fabian Hiller
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. 
+*/
+
 import * as React from "react";
 import { observer } from "mobx-react-lite";
 import OctoprintStore from "app/OctoprintStore";
@@ -8,7 +24,7 @@ import {
   Classes,
   FormGroup,
   InputGroup,
-  Callout,
+  Callout
 } from "@blueprintjs/core";
 import styled from "styled-components";
 import * as Yup from "yup";
@@ -32,7 +48,7 @@ const ValidationSchema = Yup.object().shape({
   hostname: Yup.string().required("Required"),
   port: Yup.number()
     .integer("Invalid port number")
-    .required("Required"),
+    .required("Required")
 });
 
 const octoprintAddMachine = Machine({
@@ -41,41 +57,41 @@ const octoprintAddMachine = Machine({
   states: {
     idle: {
       on: {
-        CONNECT: "connecting",
-      },
+        CONNECT: "connecting"
+      }
     },
     connecting: {
       on: {
         CONNECTION_SUCCESS: "waiting_for_auth",
-        CONNECTION_FAILURE: "connection_failed",
-      },
+        CONNECTION_FAILURE: "connection_failed"
+      }
     },
     waiting_for_auth: {
       on: {
-        TIMER: "polling_for_auth",
-      },
+        TIMER: "polling_for_auth"
+      }
     },
     polling_for_auth: {
       on: {
         AUTH_REQUEST_ACCEPTED: "auth_successful",
         AUTH_REQUEST_DENIED: "auth_failed",
-        RETRY: "waiting_for_auth",
-      },
+        RETRY: "waiting_for_auth"
+      }
     },
     connection_failed: {
       on: {
-        CONNECT: "connecting",
-      },
+        CONNECT: "connecting"
+      }
     },
     auth_successful: {
-      type: "final",
+      type: "final"
     },
     auth_failed: {
       on: {
-        CONNECT: "connecting",
-      },
-    },
-  },
+        CONNECT: "connecting"
+      }
+    }
+  }
 });
 
 const OctoprintAddDialog = observer(() => {
@@ -100,7 +116,7 @@ const OctoprintAddDialog = observer(() => {
             name: "",
             hostname: "",
             port: "80",
-            apikey: "",
+            apikey: ""
           }}
           onSubmit={values => {
             OctoprintStore.addServer(values);
@@ -149,7 +165,7 @@ const StyledDangerCallout = styled(Callout)`
 `;
 
 const CustomInputComponent = ({
-  field, // { name, value, onChange, onBlur }
+  field // { name, value, onChange, onBlur }
 }: FieldProps) => (
   <>
     <InputGroup type="text" {...field} />
