@@ -15,7 +15,13 @@ limitations under the License.
 */
 
 import * as React from "react";
-import { Button, Drawer, Classes, NumericInput } from "@blueprintjs/core";
+import {
+  Button,
+  Drawer,
+  Classes,
+  NumericInput,
+  FormGroup
+} from "@blueprintjs/core";
 import { useState } from "react";
 import { IDrawSettings } from "app/UIStore";
 import { observer } from "mobx-react-lite";
@@ -81,13 +87,16 @@ const DrawSettings = observer(
   ({ drawSettings, setDrawSetting }: IDrawSettingsButtonProps) => {
     return (
       <div>
-        <NumericInput
-          value={drawSettings.lineWidth}
-          onValueChange={action(
-            "set line width",
-            (newValue: any) => (drawSettings.lineWidth = newValue)
-          )}
-        />
+        <FormGroup label="Linewidth" labelFor="linewidth-input">
+          <NumericInput
+            value={drawSettings.lineWidth}
+            id="linewidth-input"
+            onValueChange={action(
+              "set line width",
+              (newValue: any) => (drawSettings.lineWidth = newValue)
+            )}
+          />
+        </FormGroup>
       </div>
     );
   }
