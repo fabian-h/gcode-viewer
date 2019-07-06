@@ -22,7 +22,8 @@ import {
   NumericInput,
   FormGroup,
   RadioGroup,
-  Radio
+  Radio,
+  Checkbox
 } from "@blueprintjs/core";
 import { useState } from "react";
 import { IDrawSettings } from "app/UIStore";
@@ -85,31 +86,38 @@ const SettingsDrawer = observer(
   }
 );
 
-const DrawSettings = observer(
-  ({ drawSettings, setDrawSetting }: IDrawSettingsButtonProps) => {
-    return (
-      <div>
-        <FormGroup label="Linewidth" labelFor="linewidth-input">
-          <NumericInput
-            value={drawSettings.lineWidth}
-            id="linewidth-input"
-            onValueChange={action(
-              "set line width",
-              (newValue: any) => (drawSettings.lineWidth = newValue)
-            )}
-          />
-        </FormGroup>
-        <RadioGroup
-          label="Coloring mode"
-          selectedValue={drawSettings.coloringMode}
-          onChange={action("set coloring mode", (changeEvent: any) => {
-            drawSettings.coloringMode = changeEvent.target.value;
-          })}
-        >
-          <Radio label="by feed rate" value="feed_rate" />
-          <Radio label="by tool" value="tool" />
-        </RadioGroup>
-      </div>
-    );
-  }
-);
+const DrawSettings = observer(({ drawSettings }: IDrawSettingsButtonProps) => {
+  return (
+    <div>
+      <FormGroup label="Linewidth" labelFor="linewidth-input">
+        <NumericInput
+          value={drawSettings.lineWidth}
+          id="linewidth-input"
+          onValueChange={action(
+            "set line width",
+            (newValue: any) => (drawSettings.lineWidth = newValue)
+          )}
+        />
+      </FormGroup>
+      <Checkbox
+        checked={drawSettings.scaleLinewidth}
+        label="Scale linewidth with zoom"
+        onChange={action(
+          "set line width scaling",
+          (newValue: any) =>
+            (drawSettings.scaleLinewidth = newValue.target.checked)
+        )}
+      />
+      <RadioGroup
+        label="Coloring mode"
+        selectedValue={drawSettings.coloringMode}
+        onChange={action("set coloring mode", (changeEvent: any) => {
+          drawSettings.coloringMode = changeEvent.target.value;
+        })}
+      >
+        <Radio label="by feed rate" value="feed_rate" />
+        <Radio label="by tool" value="tool" />
+      </RadioGroup>
+    </div>
+  );
+});

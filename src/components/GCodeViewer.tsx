@@ -127,6 +127,7 @@ const GCodeViewer = observer(
     // hack to get mobx to notice we use this Observable
     var tmp = drawSettings.lineWidth;
     var tmp2 = drawSettings.coloringMode;
+    var tmp3 = drawSettings.scaleLinewidth;
 
     return (
       <ResizeSensor onResize={handleResize}>
@@ -165,7 +166,12 @@ function drawInstructions(
     transform.x * devicePixelRatio,
     transform.y * devicePixelRatio
   );
-  context.lineWidth = drawSettings.lineWidth / transform.k;
+  if (drawSettings.scaleLinewidth) {
+    context.lineWidth = drawSettings.lineWidth / 50;
+  } else {
+    context.lineWidth = drawSettings.lineWidth / transform.k;
+  }
+
   context.lineCap = "round";
   context.beginPath();
 

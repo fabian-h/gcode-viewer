@@ -31,14 +31,15 @@ export class UIStore {
 
   @observable
   drawSettings: IDrawSettings = {
-    lineWidth: 2,
+    lineWidth: 8,
     coloringMode: "feed_rate",
-    toolColors: ["blue", "green", "red", "orange", "black"]
+    toolColors: ["blue", "green", "red", "orange", "black"],
+    scaleLinewidth: true
   };
 
   @action.bound
   setDrawSetting(setting: keyof IDrawSettings, value: any) {
-    this.drawSettings[setting] = value;
+    //this.drawSettings[setting] = value;
   }
 
   @computed
@@ -90,4 +91,5 @@ export interface IDrawSettings {
   lineWidth: number;
   coloringMode: string; // "feed_rate" | "tool";
   toolColors: string[];
+  scaleLinewidth: boolean;
 }
