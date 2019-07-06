@@ -20,7 +20,9 @@ import {
   Drawer,
   Classes,
   NumericInput,
-  FormGroup
+  FormGroup,
+  RadioGroup,
+  Radio
 } from "@blueprintjs/core";
 import { useState } from "react";
 import { IDrawSettings } from "app/UIStore";
@@ -97,6 +99,16 @@ const DrawSettings = observer(
             )}
           />
         </FormGroup>
+        <RadioGroup
+          label="Coloring mode"
+          selectedValue={drawSettings.coloringMode}
+          onChange={action("set coloring mode", (changeEvent: any) => {
+            drawSettings.coloringMode = changeEvent.target.value;
+          })}
+        >
+          <Radio label="by feed rate" value="feed_rate" />
+          <Radio label="by tool" value="tool" />
+        </RadioGroup>
       </div>
     );
   }

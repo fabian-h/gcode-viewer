@@ -243,6 +243,10 @@ export default class GCodeParser {
                       COMMANDS.SET_FEED_RATE,
                       this.feed_rate
                     );
+                    this.instructions.addInstruction(
+                      COMMANDS.TOOL_CHANGE,
+                      this.current_tool
+                    );
                   }
 
                   command = COMMANDS.MOVE_WITH_EXTRUSION;

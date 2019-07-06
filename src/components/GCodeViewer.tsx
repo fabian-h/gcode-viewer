@@ -126,6 +126,7 @@ const GCodeViewer = observer(
 
     // hack to get mobx to notice we use this Observable
     var tmp = drawSettings.lineWidth;
+    var tmp2 = drawSettings.coloringMode;
 
     return (
       <ResizeSensor onResize={handleResize}>
@@ -198,10 +199,24 @@ function drawInstructions(
           prevY = param2;
           break;
         case COMMANDS.SET_FEED_RATE:
-          context.stroke();
-          context.beginPath();
-          context.moveTo(prevX, prevY);
-          context.strokeStyle = interpolateInferno(feedRateScale(param1));
+          if (drawSettings.coloringMode === "feed_rate") {
+            context.stroke();
+            context.beginPath();
+            context.moveTo(prevX, prevY);
+            context.strokeStyle = interpolateInferno(feedRateScale(param1));
+          }
+          break;
+        case COMMANDS.TOOL_CHANGE:
+          if (drawSettings.coloringMode === "tool") {
+            context.stroke();
+            context.beginPath();
+            context.moveTo(prevX, prevY);
+
+            var color = drawSettings.toolColors[param1];
+            if (color) {
+              context.strokeStyle = color;
+            } else context.strokeStyle = "grey";
+          }
           break;
       }
     }

@@ -31,7 +31,9 @@ export class UIStore {
 
   @observable
   drawSettings: IDrawSettings = {
-    lineWidth: 2
+    lineWidth: 2,
+    coloringMode: "feed_rate",
+    toolColors: ["blue", "green", "red", "orange", "black"]
   };
 
   @action.bound
@@ -86,4 +88,6 @@ export interface IGCode {
 
 export interface IDrawSettings {
   lineWidth: number;
+  coloringMode: string; // "feed_rate" | "tool";
+  toolColors: string[];
 }
