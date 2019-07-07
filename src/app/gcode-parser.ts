@@ -18,12 +18,17 @@ interface IMinMax {
   min: number;
   max: number;
 }
+
+interface ITool {
+  extrusion: number;
+}
 export interface IStatistics {
   x: IMinMax;
   y: IMinMax;
   z: IMinMax;
   feed_rate: IMinMax;
   extruded_feed_rate: IMinMax;
+  tools: ITool[];
 }
 
 const STATE_NONE = 0;
@@ -101,7 +106,7 @@ export default class GCodeParser {
     this.field_values.fill(NaN);
   }
 
-  statistics = {
+  statistics: IStatistics = {
     x: {
       min: Infinity,
       max: -Infinity
@@ -121,7 +126,12 @@ export default class GCodeParser {
     extruded_feed_rate: {
       min: Infinity,
       max: -Infinity
-    }
+    },
+    tools: [
+      {
+        extrusion: 0
+      }
+    ]
   };
 
   parse(gcodeArrayBuffer: ArrayBuffer) {
@@ -268,6 +278,10 @@ export default class GCodeParser {
                       this.statistics.extruded_feed_rate.min = this.feed_rate;
                   }
                   this.last_feed_rate_with_extrusion = this.feed_rate;
+
+                  this.statistics.tools[
+                    this.current_tool
+                  ].extrusion += this.field_values[E];
                 } else {
                   command = COMMANDS.MOVE_WITHOUT_EXTRUSION;
                 }
@@ -346,6 +360,8 @@ export default class GCodeParser {
             this.field_values[T]
           );
           this.current_tool = this.field_values[T];
+          if (this.statistics.tools[this.current_tool] == undefined)
+            this.statistics.tools[this.current_tool] = { extrusion: 0 };
         }
 
         // reset all fields to NaN so that we don't use fields defined

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
-import { Button, Dialog, Classes } from "@blueprintjs/core";
+import { Button, Dialog, Classes, HTMLTable } from "@blueprintjs/core";
 import { IStatistics } from "app/gcode-parser";
 
 /* 
@@ -55,6 +55,8 @@ const StatisticsModal = observer(
               {statistics.extruded_feed_rate.max.toFixed(0)} feed rate while
               extruding
             </p>
+            <h2>Tool overview</h2>
+            <ToolTable statistics={statistics} />
           </div>
         </Dialog>
       </>
@@ -62,3 +64,24 @@ const StatisticsModal = observer(
   }
 );
 export default StatisticsModal;
+
+function ToolTable({ statistics }: { statistics: IStatistics }) {
+  return (
+    <HTMLTable bordered={true} condensed={true}>
+      <thead>
+        <tr>
+          <th>tool</th>
+          <th>extrusion</th>
+        </tr>
+      </thead>
+      <tbody>
+        {statistics.tools.map((tool, index) => (
+          <tr>
+            <td>{index}</td>
+            <td>{tool.extrusion.toFixed(2)} mm</td>
+          </tr>
+        ))}
+      </tbody>
+    </HTMLTable>
+  );
+}
