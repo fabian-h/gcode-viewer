@@ -101,7 +101,7 @@ const App = observer(IProps => {
           <FormGroup label="Current layer">
             <Slider
               value={UIStore.activeLayer}
-              min={1}
+              min={0}
               max={
                 UIStore.numberOfLayers !== 0 ? UIStore.numberOfLayers - 2 : 100
               }
