@@ -42,7 +42,10 @@ export function uploadGCodeFiles(files: FileList): Promise<IGCode> {
         console.log(
           `Read ${fileSizeMB.toFixed(2)} megabytes in ${delta.toFixed(
             0
-          )} ms. ${(delta / fileSizeMB).toFixed(0)} ms/megabyte`
+          )} ms. ${(delta / fileSizeMB).toFixed(0)} ms/megabyte ${(
+            1000 /
+            (delta / fileSizeMB)
+          ).toFixed(1)} megabyte/s`
         );
         const parsingResult = parser.getParsingResult();
         resolve({
