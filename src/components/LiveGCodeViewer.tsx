@@ -47,8 +47,7 @@ const LiveGCodeViewer = observer(
     );*/
       return (
         <GCodeViewer
-          from={from}
-          to={to}
+          currentLayer={0} // Fix this
           activeGCode={activeGCode}
           transform={transform}
           setTransform={setTransform}

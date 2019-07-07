@@ -31,10 +31,15 @@ const StyledCanvas = styled.canvas`
   flex: 1;
 `;
 
+const OverlayDiv = styled.div`
+  position: absolute;
+  padding: 5px;
+  background-color: transparent;
+`;
+
 interface IProps {
-  from: number;
-  to: number;
-  activeGCode: IGCode | null;
+  currentLayer: number;
+  activeGCode: IGCode;
   transform: ITransform;
   setTransform: (newTransfrom: ITransform) => void;
   drawSettings: IDrawSettings;
@@ -48,8 +53,7 @@ export interface ITransform {
 
 const GCodeViewer = observer(
   ({
-    from,
-    to,
+    currentLayer,
     activeGCode,
     transform,
     setTransform,
@@ -81,8 +85,8 @@ const GCodeViewer = observer(
       clearCanvas(canvas.current, context);
       drawInstructions(
         context,
-        from,
-        to,
+        activeGCode.layerPositions[currentLayer],
+        activeGCode.layerPositions[currentLayer + 1],
         activeGCode.instructions,
         transform,
         devicePixelRatio,
@@ -131,7 +135,14 @@ const GCodeViewer = observer(
 
     return (
       <ResizeSensor onResize={handleResize}>
-        <StyledCanvas ref={canvas} />
+        <>
+          <OverlayDiv>
+            Layer {currentLayer}
+            <br />
+            Layer height: {activeGCode.layerHeights[currentLayer].toFixed(2)}
+          </OverlayDiv>
+          <StyledCanvas ref={canvas} />
+        </>
       </ResizeSensor>
     );
   }

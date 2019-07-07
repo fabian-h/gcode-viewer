@@ -81,6 +81,7 @@ export interface IGCode {
   name: string;
   instructions: Instructions;
   layerPositions: number[];
+  layerHeights: number[];
   numberOfLayers: number;
   statistics: IStatistics;
   connection?: OctoprintConnection;

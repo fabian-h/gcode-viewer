@@ -83,6 +83,7 @@ export default class GCodeParser {
   last_feed_rate_with_extrusion: number | undefined;
   current_layer_index = 0;
   layer_positions: number[] = [];
+  layer_heights: number[] = [];
 
   prev_x = 0;
   prev_y = 0;
@@ -229,6 +230,7 @@ export default class GCodeParser {
                     this.layer_positions.push(
                       this.instructions.totalInstructions
                     );
+                    this.layer_heights.push(this.prev_z);
                     this.current_layer_index += 1;
 
                     // set all relevant parameters at the start of each layer
@@ -383,6 +385,7 @@ export default class GCodeParser {
     return {
       instructions: this.instructions,
       layerPositions: this.layer_positions,
+      layerHeights: this.layer_heights,
       statistics: this.statistics,
       lineIndex: [] //this.line_index
     };

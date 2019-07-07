@@ -48,8 +48,7 @@ const StaticGCodeViewer = observer(
       return (
         <StyledDiv onDragOver={handleDragOver} onDragLeave={handleDragLeave}>
           <GCodeViewer
-            from={activeGCode.layerPositions[activeLayer]}
-            to={activeGCode.layerPositions[activeLayer + 1]}
+            currentLayer={activeLayer}
             activeGCode={activeGCode}
             transform={transform}
             setTransform={setTransform}
