@@ -23,7 +23,8 @@ import UIStore from "app/UIStore";
 const DropzoneContainer = styled.div`
   flex: 1;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  justify-content: center;
   align-items: center;
   padding: 20px;
   margin: 10px;
@@ -32,7 +33,13 @@ const DropzoneContainer = styled.div`
   border-color: #bbb;
   border-style: dashed;
   background-color: #fafafa;
-  color: #333;
+  color: #666;
+  font-size: 300%;
+  font-weight: bold;
+`;
+
+const CenteredParagraph = styled.p`
+  text-align: center;
 `;
 
 interface IProps {
@@ -54,7 +61,10 @@ export function GCodeDropzone({ onFileLoad }: IProps) {
       {isDragActive ? (
         <p>Drop the files here ...</p>
       ) : (
-        <p>Drag 'n' drop some files here, or click to select files</p>
+        <CenteredParagraph>
+          Drag a G-Code file here
+          <br /> or <br /> click to select a file
+        </CenteredParagraph>
       )}
     </DropzoneContainer>
   );
