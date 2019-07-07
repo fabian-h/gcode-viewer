@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "G-Code viewer",
+  "name": "G-Code viewer for 3D printing",
   "icons": [
     {
       "src": "favicon.ico",
