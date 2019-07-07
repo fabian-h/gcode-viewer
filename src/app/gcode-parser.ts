@@ -21,6 +21,7 @@ interface IMinMax {
 export interface IStatistics {
   x: IMinMax;
   y: IMinMax;
+  z: IMinMax;
   feed_rate: IMinMax;
   extruded_feed_rate: IMinMax;
 }
@@ -107,6 +108,10 @@ export default class GCodeParser {
     },
     y: {
       min: Infinity,
+      max: -Infinity
+    },
+    z: {
+      min: 0,
       max: -Infinity
     },
     feed_rate: {
@@ -232,6 +237,9 @@ export default class GCodeParser {
                     );
                     this.layer_heights.push(this.prev_z);
                     this.current_layer_index += 1;
+
+                    if (this.prev_z > this.statistics.z.max)
+                      this.statistics.z.max = this.prev_z;
 
                     // set all relevant parameters at the start of each layer
                     // so that each layer contains all necessary information

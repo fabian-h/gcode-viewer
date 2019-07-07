@@ -1,7 +1,7 @@
 import * as React from "react";
 import { observer } from "mobx-react-lite";
 import { useState } from "react";
-import { Button, Dialog } from "@blueprintjs/core";
+import { Button, Dialog, Classes } from "@blueprintjs/core";
 import { IStatistics } from "app/gcode-parser";
 
 /* 
@@ -27,31 +27,35 @@ const StatisticsModal = observer(
     return (
       <>
         <Button
-          className="bp3"
+          className="bp3-minimal"
           text="Statistics"
+          icon="timeline-bar-chart"
           onClick={() => setOpen(true)}
         />
         <Dialog
           isOpen={isOpen}
-          icon="cloud-download"
+          icon="timeline-bar-chart"
           title="Statistics"
           onClose={() => setOpen(false)}
         >
-          <h2>Dimensions</h2>
-          <p>
-            {(statistics.x.max - statistics.x.min).toFixed(2)} x
-            {(statistics.y.max - statistics.y.min).toFixed(2)} mm
-          </p>
-          <h2>Feed rate</h2>
-          <p>
-            {statistics.feed_rate.min.toFixed(0)} -{" "}
-            {statistics.feed_rate.max.toFixed(0)} feed rate
-          </p>
-          <p>
-            {statistics.extruded_feed_rate.min.toFixed(0)} -{" "}
-            {statistics.extruded_feed_rate.max.toFixed(0)} feed rate while
-            extruding
-          </p>
+          <div className={Classes.DIALOG_BODY}>
+            <h2>Dimensions</h2>
+            <p>
+              {(statistics.x.max - statistics.x.min).toFixed(2)}&nbsp;x&nbsp;
+              {(statistics.y.max - statistics.y.min).toFixed(2)}&nbsp;x&nbsp;
+              {(statistics.z.max - statistics.z.min).toFixed(2)}&nbsp;mm
+            </p>
+            <h2>Feed rate</h2>
+            <p>
+              {statistics.feed_rate.min.toFixed(0)} -{" "}
+              {statistics.feed_rate.max.toFixed(0)} feed rate
+            </p>
+            <p>
+              {statistics.extruded_feed_rate.min.toFixed(0)} -{" "}
+              {statistics.extruded_feed_rate.max.toFixed(0)} feed rate while
+              extruding
+            </p>
+          </div>
         </Dialog>
       </>
     );

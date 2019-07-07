@@ -31,6 +31,8 @@ import LiveGCodeViewer from "./LiveGCodeViewer";
 import StaticGCodeViewer from "./StaticGCodeViewer";
 import DrawSettingsButton from "./DrawSettings";
 
+import Statistics from "./Statistics";
+
 // See https://blueprintjs.com/docs/#core/accessibility.focus-management
 FocusStyleManager.onlyShowFocusOnTabs();
 
@@ -80,6 +82,9 @@ const App = observer(IProps => {
               drawSettings={UIStore.drawSettings}
               setDrawSetting={UIStore.setDrawSetting}
             />
+            {UIStore.activeGCode && (
+              <Statistics statistics={UIStore.activeGCode.statistics} />
+            )}
           </Navbar.Group>
         </Navbar>
       </TopbarContainer>
