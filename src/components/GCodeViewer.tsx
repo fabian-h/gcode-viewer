@@ -85,9 +85,8 @@ const GCodeViewer = observer(
       clearCanvas(canvas.current, context);
       drawInstructions(
         context,
-        activeGCode.layerPositions[currentLayer],
-        activeGCode.layerPositions[currentLayer + 1],
-        activeGCode.instructions,
+        currentLayer,
+        activeGCode,
         transform,
         devicePixelRatio,
         drawSettings,
@@ -151,23 +150,14 @@ export default GCodeViewer;
 
 function drawInstructions(
   context: CanvasRenderingContext2D,
-  from: number,
-  to: number,
-  instructions: Instructions,
+  layer: number,
+  activeGCode: IGCode,
   transform: any,
   devicePixelRatio: number,
   drawSettings: IDrawSettings,
   statistics: IStatistics
 ) {
-  const feedRateScale = scaleLinear()
-    .domain([
-      statistics.extruded_feed_rate.min,
-      statistics.extruded_feed_rate.max
-    ])
-    .range([0, 0.8]);
-
-  let prevX = 0;
-  let prevY = 0;
+  const instructions = activeGCode.instructions;
 
   context.setTransform(
     transform.k * devicePixelRatio,
@@ -184,6 +174,35 @@ function drawInstructions(
   }
 
   context.lineCap = "round";
+  drawLayer(
+    context,
+    instructions,
+    activeGCode.layerPositions[layer],
+    activeGCode.layerPositions[layer + 1],
+    drawSettings,
+    statistics,
+    undefined
+  );
+}
+
+function drawLayer(
+  context: CanvasRenderingContext2D,
+  instructions: Instructions,
+  from: number,
+  to: number,
+  drawSettings: IDrawSettings,
+  statistics: IStatistics,
+  overrideColor: string | undefined
+) {
+  let prevX = 0;
+  let prevY = 0;
+
+  const feedRateScale = scaleLinear()
+    .domain([
+      statistics.extruded_feed_rate.min,
+      statistics.extruded_feed_rate.max
+    ])
+    .range([0, 0.8]);
   context.beginPath();
 
   const firstBuffer = Math.floor(from / instructions.blockSizeInInstructions);
@@ -239,29 +258,6 @@ function drawInstructions(
     }
   }
   context.stroke();
-
-  /*for (let i = from; i < to; ++i) {
-    let command = instructions.i8[i * 16];
-    let v1 = instructions.f32[i * 4 + 1];
-    let v2 = instructions.f32[i * 4 + 2];
-    if (command === 1) {
-      context.moveTo(v1, v2);
-      prevX = v1;
-      prevY = v2;
-    } else if (command === 2) {
-      context.lineTo(v1, v2);
-      prevX = v1;
-      prevY = v2;
-    } else if (command === 3) {
-      context.stroke();
-      context.beginPath();
-      context.moveTo(prevX, prevY);
-      context.strokeStyle = interpolateInferno(
-        feedRateScale(instructions.f32[i * 4 + 1])
-      );
-    }
-  }
-  context.stroke();*/
 }
 
 function clearCanvas(
