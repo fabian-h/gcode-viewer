@@ -29,6 +29,7 @@ import {
 import styled from "styled-components";
 import * as Yup from "yup";
 import { Machine, interpret } from "xstate";
+import { useMachine } from "@xstate/react";
 import { useState } from "react";
 
 interface IProps {}
@@ -48,7 +49,8 @@ const ValidationSchema = Yup.object().shape({
   hostname: Yup.string().required("Required"),
   port: Yup.number()
     .integer("Invalid port number")
-    .required("Required")
+    .required("Required"),
+  user: Yup.string().required("Required")
 });
 
 const octoprintAddMachine = Machine({
@@ -62,20 +64,14 @@ const octoprintAddMachine = Machine({
     },
     connecting: {
       on: {
-        CONNECTION_SUCCESS: "waiting_for_auth",
+        CONNECTION_SUCCESS: "polling_for_auth",
         CONNECTION_FAILURE: "connection_failed"
-      }
-    },
-    waiting_for_auth: {
-      on: {
-        TIMER: "polling_for_auth"
       }
     },
     polling_for_auth: {
       on: {
         AUTH_REQUEST_ACCEPTED: "auth_successful",
-        AUTH_REQUEST_DENIED: "auth_failed",
-        RETRY: "waiting_for_auth"
+        AUTH_REQUEST_DENIED: "auth_failed"
       }
     },
     connection_failed: {
@@ -84,7 +80,9 @@ const octoprintAddMachine = Machine({
       }
     },
     auth_successful: {
-      type: "final"
+      on: {
+        RESET: "idle"
+      }
     },
     auth_failed: {
       on: {
@@ -94,8 +92,46 @@ const octoprintAddMachine = Machine({
   }
 });
 
+async function connectToOctoprint() {
+  try {
+    const response = await fetch("http://localhost:5000/plugin/appkeys/probe");
+    return response.status === 204;
+  } catch (e) {
+    return false;
+  }
+}
+
+async function pollingForAuth() {
+  const response = await fetch("http://localhost:5000/plugin/appkeys/request", {
+    mode: "cors",
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      app: "G-Code viewer"
+    })
+  });
+  const app_token = (await response.json()).app_token;
+  while (true) {
+    const pollResponse = await fetch(
+      "http://localhost:5000/plugin/appkeys/request/" + app_token
+    );
+    if (pollResponse.status === 200) {
+      const body = await pollResponse.json();
+      return body.api_key;
+    }
+    if (pollResponse.status === 404) {
+      return null;
+    }
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+}
+
 const OctoprintAddDialog = observer(() => {
   const [isOpen, setOpen] = useState(false);
+
+  const [currentState, send] = useMachine(octoprintAddMachine);
 
   return (
     <>
@@ -109,18 +145,37 @@ const OctoprintAddDialog = observer(() => {
         isOpen={isOpen}
         icon="cloud-download"
         title="Add Octoprint server"
-        onClose={() => setOpen(false)}
+        onClose={() => {
+          setOpen(false);
+          send("RESET");
+        }}
       >
         <Formik
           initialValues={{
-            name: "",
-            hostname: "",
-            port: "80",
-            apikey: ""
+            name: "Test",
+            hostname: "localhost",
+            port: "5000",
+            user: ""
           }}
-          onSubmit={values => {
-            OctoprintStore.addServer(values);
-            setOpen(false);
+          onSubmit={async values => {
+            send("CONNECT");
+            const x = await connectToOctoprint();
+            console.log(x);
+            if (x) {
+              send("CONNECTION_SUCCESS");
+              const apikey = await pollingForAuth();
+
+              if (apikey) {
+                const server = { apikey: apikey, ...values };
+                OctoprintStore.addServer(server);
+                send("AUTH_REQUEST_ACCEPTED");
+              } else {
+                send("AUTH_REQUEST_DENIED");
+              }
+            } else {
+              send("CONNECTION_FAILURE");
+            }
+            //setOpen(false);
           }}
           validationSchema={ValidationSchema}
           render={({ isSubmitting }) => (
@@ -134,21 +189,60 @@ const OctoprintAddDialog = observer(() => {
                     application in the browser.
                   </p>
                 </StyledCallout>
-                <TextField label="Name" name="name" />
-                <TextField label="Hostname or IP address" name="hostname" />
-                <TextField label="Port" name="port" />
-                <TextField label="API Key" name="apikey" />
+                <TextField
+                  label="Name"
+                  name="name"
+                  disabled={!currentState.matches("idle")}
+                />
+                <TextField
+                  label="Hostname or IP address"
+                  name="hostname"
+                  disabled={!currentState.matches("idle")}
+                />
+                <TextField
+                  label="Port"
+                  name="port"
+                  disabled={!currentState.matches("idle")}
+                />
+                <TextField
+                  label="Username"
+                  name="user"
+                  disabled={!currentState.matches("idle")}
+                />
               </div>
               <div className={Classes.DIALOG_FOOTER}>
                 <div className={Classes.DIALOG_FOOTER_ACTIONS}>
-                  <Button
-                    type="submit"
-                    intent="success"
-                    disabled={isSubmitting}
-                  >
-                    Add Octoprint server
-                  </Button>
-                  <Button onClick={() => setOpen(false)}>Cancel</Button>
+                  {currentState.matches("idle") && (
+                    <>
+                      <Button
+                        type="submit"
+                        intent="success"
+                        disabled={isSubmitting}
+                      >
+                        Requestion authentication from Octoprint
+                      </Button>
+                      <Button onClick={() => setOpen(false)}>Cancel</Button>
+                    </>
+                  )}
+                  {currentState.matches("connecting") && (
+                    <Callout intent="primary">
+                      Connecting to Octoprint server
+                    </Callout>
+                  )}
+                  {currentState.matches("polling_for_auth") && (
+                    <Callout intent="primary">
+                      Waiting for authorization. Open Octoprint and approve the
+                      authorization request to continue.
+                    </Callout>
+                  )}
+                  {currentState.matches("auth_successful") && (
+                    <Callout intent="success">
+                      Successfully added Octoprint server.
+                    </Callout>
+                  )}
+                  {currentState.matches("auth_failed") && (
+                    <Callout intent="danger">Authorization was denied.</Callout>
+                  )}
                 </div>
               </div>
             </Form>
@@ -179,8 +273,21 @@ const CustomInputComponent = ({
   </>
 );
 
-const TextField = ({ label, name }: { label: string; name: string }) => (
+const TextField = ({
+  label,
+  name,
+  disabled
+}: {
+  label: string;
+  name: string;
+  disabled?: boolean;
+}) => (
   <FormGroup label={label} labelFor={`${name}-input`}>
-    <Field id={`${name}-input`} name={name} component={CustomInputComponent} />
+    <Field
+      id={`${name}-input`}
+      name={name}
+      component={CustomInputComponent}
+      disabled={disabled}
+    />
   </FormGroup>
 );

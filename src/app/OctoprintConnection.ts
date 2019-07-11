@@ -29,7 +29,7 @@ export default class OctoprintConnection {
   @observable
   progress: IProgress | null = null;
 
-  constructor(domain: string, port: string) {
+  constructor(domain: string, port: string, user: string, apikey: string) {
     const serverId = Math.floor(Math.random() * 999 + 1);
     const sessionId = this.generateSessionId();
     this.domain = domain;
@@ -38,6 +38,9 @@ export default class OctoprintConnection {
 
     this.socket = new WebSocket(this.url);
     this.socket.onmessage = event => this.handleMessage(event);
+    this.socket.onopen = () => {
+      this.socket.send(`["{\\"auth\\":\\"${user}:${apikey}\\"}"]`);
+    };
   }
 
   public getCurrentFile() {
@@ -77,8 +80,10 @@ export default class OctoprintConnection {
   }
 
   private handleMessage(event: MessageEvent) {
+    // console.log("E", event.data);
     if (event.data.startsWith("a")) {
       var payload = JSON.parse(event.data.slice(1));
+      //console.log(payload);
       if (payload.length === 1 && payload[0].current) {
         const data = payload[0].current;
 

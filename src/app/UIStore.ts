@@ -34,7 +34,8 @@ export class UIStore {
     lineWidth: 8,
     coloringMode: "feed_rate",
     toolColors: ["blue", "green", "red", "orange", "black"],
-    scaleLinewidth: true
+    scaleLinewidth: true,
+    drawPreviousLayers: 2
   };
 
   @action.bound
@@ -93,4 +94,5 @@ export interface IDrawSettings {
   coloringMode: string; // "feed_rate" | "tool";
   toolColors: string[];
   scaleLinewidth: boolean;
+  drawPreviousLayers: number;
 }

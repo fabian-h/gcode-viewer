@@ -32,7 +32,12 @@ class OctoprintStore {
     autorun(reaction => {
       this.servers = this.servers.map(({ config }) => ({
         config: config,
-        connection: new OctoprintConnection(config.hostname, config.port)
+        connection: new OctoprintConnection(
+          config.hostname,
+          config.port,
+          config.user,
+          config.apikey
+        )
       }));
     });
   }
@@ -69,5 +74,6 @@ export interface IOctoprintConfig {
   name: string;
   hostname: string;
   port: string;
+  user: string;
   apikey: string;
 }
