@@ -178,7 +178,7 @@ const OctoprintAddDialog = observer(() => {
             //setOpen(false);
           }}
           validationSchema={ValidationSchema}
-          render={({ isSubmitting }) => (
+          render={() => (
             <Form>
               <div className={Classes.DIALOG_BODY}>
                 <StyledCallout>
@@ -214,11 +214,7 @@ const OctoprintAddDialog = observer(() => {
                 <div className={Classes.DIALOG_FOOTER_ACTIONS}>
                   {currentState.matches("idle") && (
                     <>
-                      <Button
-                        type="submit"
-                        intent="success"
-                        disabled={isSubmitting}
-                      >
+                      <Button type="submit" intent="success">
                         Requestion authentication from Octoprint
                       </Button>
                       <Button onClick={() => setOpen(false)}>Cancel</Button>
@@ -242,6 +238,17 @@ const OctoprintAddDialog = observer(() => {
                   )}
                   {currentState.matches("auth_failed") && (
                     <Callout intent="danger">Authorization was denied.</Callout>
+                  )}
+                  {currentState.matches("connection_failed") && (
+                    <>
+                      <Callout intent="danger">
+                        Error connecting to Octoprint. Make sure the hostname
+                        and port are correct and that CORS is disabled.
+                      </Callout>
+                      <Button type="submit" intent="success">
+                        Retry
+                      </Button>
+                    </>
                   )}
                 </div>
               </div>
