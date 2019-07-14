@@ -90,6 +90,7 @@ export default class GCodeParser {
   current_layer_index = 0;
   layer_positions: number[] = [];
   layer_heights: number[] = [];
+  layer_byte_positions: number[] = [];
 
   prev_x = 0;
   prev_y = 0;
@@ -238,6 +239,7 @@ export default class GCodeParser {
                 ) {
                   if (this.prev_z !== this.last_z_with_extrusion) {
                     this.instructions.addInstruction(
+                      this.byte_index,
                       COMMANDS.LAYER_CHANGE,
                       this.prev_z
                     );
@@ -246,6 +248,7 @@ export default class GCodeParser {
                       this.instructions.totalInstructions
                     );
                     this.layer_heights.push(this.prev_z);
+                    this.layer_byte_positions.push(this.byte_index);
                     this.current_layer_index += 1;
 
                     if (this.prev_z > this.statistics.z.max)
@@ -255,15 +258,18 @@ export default class GCodeParser {
                     // so that each layer contains all necessary information
                     // for displaying it
                     this.instructions.addInstruction(
+                      this.byte_index,
                       COMMANDS.MOVE_WITHOUT_EXTRUSION,
                       this.prev_x,
                       this.prev_y
                     );
                     this.instructions.addInstruction(
+                      this.byte_index,
                       COMMANDS.SET_FEED_RATE,
                       this.feed_rate
                     );
                     this.instructions.addInstruction(
+                      this.byte_index,
                       COMMANDS.TOOL_CHANGE,
                       this.current_tool
                     );
@@ -307,7 +313,12 @@ export default class GCodeParser {
                   if (y_coord < this.statistics.y.min)
                     this.statistics.y.min = y_coord;
                 } else y_coord = this.prev_y;
-                this.instructions.addInstruction(command, x_coord, y_coord);
+                this.instructions.addInstruction(
+                  this.byte_index,
+                  command,
+                  x_coord,
+                  y_coord
+                );
                 //this.line_index.push(this.byte_index);
                 this.prev_x = x_coord;
                 this.prev_y = y_coord;
@@ -317,6 +328,7 @@ export default class GCodeParser {
               if (!isNaN(this.field_values[F])) {
                 this.feed_rate = this.field_values[F];
                 this.instructions.addInstruction(
+                  this.byte_index,
                   COMMANDS.SET_FEED_RATE,
                   this.field_values[F]
                 );
@@ -329,7 +341,10 @@ export default class GCodeParser {
 
               if (!isNaN(this.field_values[Z])) {
                 if (this.field_values[Z] > this.prev_z) {
-                  this.instructions.addInstruction(COMMANDS.RETRACTION);
+                  this.instructions.addInstruction(
+                    this.byte_index,
+                    COMMANDS.RETRACTION
+                  );
                   //this.line_index.push(this.byte_index);
                 }
                 this.prev_z = this.field_values[Z];
@@ -356,6 +371,7 @@ export default class GCodeParser {
           }
         } else if (!isNaN(this.field_values[T])) {
           this.instructions.addInstruction(
+            this.byte_index,
             COMMANDS.TOOL_CHANGE,
             this.field_values[T]
           );
@@ -410,6 +426,7 @@ export default class GCodeParser {
       instructions: this.instructions,
       layerPositions: this.layer_positions,
       layerHeights: this.layer_heights,
+      layerBytePositions: this.layer_byte_positions,
       statistics: this.statistics,
       lineIndex: [] //this.line_index
     };
@@ -423,6 +440,7 @@ export class Instructions {
   currentInstruction = 0;
   currentFloat32Array: Float32Array;
   totalInstructions = 0;
+  lastByteIndex = 0;
 
   constructor(blockSizeInInstructions: number) {
     this.blockSizeInInstructions = blockSizeInInstructions;
@@ -432,8 +450,21 @@ export class Instructions {
     );
   }
 
-  addInstruction(command: number, param1?: number, param2?: number) {
-    this.currentFloat32Array[this.currentInstruction * 3] = command;
+  addInstruction(
+    byte_index: number,
+    command: number,
+    param1?: number,
+    param2?: number
+  ) {
+    // the command is encoded in the first byte, the delta to the last
+    // byte index in the last three bytes.
+    const command_and_byte_index =
+      command | ((byte_index - this.lastByteIndex) << 8);
+    this.lastByteIndex = byte_index;
+
+    this.currentFloat32Array[
+      this.currentInstruction * 3
+    ] = command_and_byte_index;
     if (param1 !== undefined)
       this.currentFloat32Array[this.currentInstruction * 3 + 1] = param1;
     if (param2 !== undefined)

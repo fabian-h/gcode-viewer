@@ -219,7 +219,7 @@ function drawLayer(
     let end = to - i * instructions.blockSizeInInstructions;
 
     for (let j = offset * 3; j < end * 3; j += 3) {
-      command = currentF32Buffer[j];
+      command = currentF32Buffer[j] & 255;
       param1 = currentF32Buffer[j + 1];
       param2 = currentF32Buffer[j + 2];
 
