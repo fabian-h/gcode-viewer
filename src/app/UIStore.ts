@@ -83,10 +83,12 @@ export interface IGCode {
   instructions: Instructions;
   layerPositions: number[];
   layerHeights: number[];
+  layerBytePositions: number[];
   numberOfLayers: number;
   statistics: IStatistics;
   connection?: OctoprintConnection;
   lineIndex: number[];
+  live?: boolean;
 }
 
 export interface IDrawSettings {

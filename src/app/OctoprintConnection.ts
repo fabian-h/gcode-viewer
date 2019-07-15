@@ -22,6 +22,7 @@ export default class OctoprintConnection {
   private socket: WebSocket;
   private domain: string;
   private port: string;
+  private apikey: string;
 
   @observable
   status: string = "";
@@ -35,6 +36,7 @@ export default class OctoprintConnection {
     this.domain = domain;
     this.port = port;
     this.url = `ws://${domain}:${port}/sockjs/${serverId}/${sessionId}/websocket`;
+    this.apikey = apikey;
 
     this.socket = new WebSocket(this.url);
     this.socket.onmessage = event => this.handleMessage(event);
@@ -46,7 +48,12 @@ export default class OctoprintConnection {
   public getCurrentFile() {
     if (this.progress && this.progress.path) {
       return fetch(
-        `http://${this.domain}:${this.port}/downloads/files/local/${this.progress.path}`
+        `http://${this.domain}:${this.port}/downloads/files/local/${this.progress.path}`,
+        {
+          headers: {
+            "X-Api-Key": this.apikey
+          }
+        }
       );
     } else return null;
   }

@@ -93,14 +93,14 @@ const App = observer(IProps => {
       </TopbarContainer>
 
       <ViewerContainer>
-        {UIStore.trackProgress ? (
+        {UIStore.activeGCode && UIStore.activeGCode.live ? (
           <LiveGCodeViewer UIStore={UIStore} />
         ) : (
           <StaticGCodeViewer UIStore={UIStore} />
         )}
         <OctoprintOverview />
       </ViewerContainer>
-      {UIStore.activeGCode ? (
+      {UIStore.activeGCode && !UIStore.activeGCode.live ? (
         <ToolContainer>
           <FormGroup label="Current layer">
             <Slider
