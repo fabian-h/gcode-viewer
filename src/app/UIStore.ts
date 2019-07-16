@@ -34,7 +34,8 @@ export class UIStore {
     lineWidth: 8,
     coloringMode: "feed_rate",
     toolColors: ["blue", "green", "red", "orange", "black"],
-    scaleLinewidth: true
+    scaleLinewidth: true,
+    drawPreviousLayers: 2
   };
 
   @action.bound
@@ -82,10 +83,12 @@ export interface IGCode {
   instructions: Instructions;
   layerPositions: number[];
   layerHeights: number[];
+  layerBytePositions: number[];
   numberOfLayers: number;
   statistics: IStatistics;
   connection?: OctoprintConnection;
   lineIndex: number[];
+  live?: boolean;
 }
 
 export interface IDrawSettings {
@@ -93,4 +96,5 @@ export interface IDrawSettings {
   coloringMode: string; // "feed_rate" | "tool";
   toolColors: string[];
   scaleLinewidth: boolean;
+  drawPreviousLayers: number;
 }

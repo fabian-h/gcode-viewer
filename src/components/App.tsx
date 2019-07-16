@@ -32,6 +32,8 @@ import StaticGCodeViewer from "./StaticGCodeViewer";
 import DrawSettingsButton from "./DrawSettings";
 
 import Statistics from "./Statistics";
+import OctoprintAddDialog from "./octoprint/OctoprintAddDialog";
+import OctoprintOverview from "./octoprint/OctoprintOverview";
 
 // See https://blueprintjs.com/docs/#core/accessibility.focus-management
 FocusStyleManager.onlyShowFocusOnTabs();
@@ -82,6 +84,7 @@ const App = observer(IProps => {
               drawSettings={UIStore.drawSettings}
               setDrawSetting={UIStore.setDrawSetting}
             />
+            <OctoprintAddDialog />
             {UIStore.activeGCode && (
               <Statistics statistics={UIStore.activeGCode.statistics} />
             )}
@@ -90,13 +93,14 @@ const App = observer(IProps => {
       </TopbarContainer>
 
       <ViewerContainer>
-        {UIStore.trackProgress ? (
+        {UIStore.activeGCode && UIStore.activeGCode.live ? (
           <LiveGCodeViewer UIStore={UIStore} />
         ) : (
           <StaticGCodeViewer UIStore={UIStore} />
         )}
+        <OctoprintOverview />
       </ViewerContainer>
-      {UIStore.activeGCode ? (
+      {UIStore.activeGCode && !UIStore.activeGCode.live ? (
         <ToolContainer>
           <FormGroup label="Current layer">
             <Slider

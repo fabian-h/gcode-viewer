@@ -32,22 +32,18 @@ const LiveGCodeViewer = observer(
       activeGCode.connection &&
       activeGCode.connection.progress
     ) {
-      const currentLine = getLineByBytePos(
+      const layer = getLayerFromBytePosition(
         activeGCode.connection.progress.filepos,
-        activeGCode
+        activeGCode.layerBytePositions
       );
-      const from = findLayerByLine(activeGCode.layerPositions, currentLine);
-      const to = currentLine;
-      /*console.log(
-      "LIVE",
-      activeGCode.connection.progress.filepos,
-      currentLine,
-      from,
-      to
-    );*/
+
       return (
         <GCodeViewer
-          currentLayer={0} // Fix this
+          currentLayer={layer}
+          bytesToDraw={
+            activeGCode.connection.progress.filepos -
+            activeGCode.layerBytePositions[layer]
+          }
           activeGCode={activeGCode}
           transform={transform}
           setTransform={setTransform}
@@ -59,20 +55,13 @@ const LiveGCodeViewer = observer(
 );
 export default LiveGCodeViewer;
 
-function findLayerByLine(layerPositions: number[], currentLine: number) {
+function getLayerFromBytePosition(
+  bytePosition: number,
+  layerPositions: number[]
+) {
+  let rv = 0;
   for (let i = 0; i < layerPositions.length; ++i) {
-    if (layerPositions[i] > currentLine) {
-      return layerPositions[i - 1];
-    }
+    if (bytePosition >= layerPositions[i]) rv = i;
   }
-  return layerPositions.length;
-}
-
-function getLineByBytePos(bytepos: number, activeGCode: IGCode) {
-  for (let i = 0; i < activeGCode.lineIndex.length; ++i) {
-    if (activeGCode.lineIndex[i] > bytepos) {
-      return i;
-    }
-  }
-  return activeGCode.lineIndex.length;
+  return rv;
 }

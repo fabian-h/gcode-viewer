@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@xstate/react": "^0.7.0",
     "d3": "^5.9.1",
     "formik": "^1.5.7",
     "gh-pages": "^2.0.1",

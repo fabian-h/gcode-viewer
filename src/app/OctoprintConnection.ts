@@ -22,6 +22,7 @@ export default class OctoprintConnection {
   private socket: WebSocket;
   private domain: string;
   private port: string;
+  private apikey: string;
 
   @observable
   status: string = "";
@@ -29,21 +30,30 @@ export default class OctoprintConnection {
   @observable
   progress: IProgress | null = null;
 
-  constructor(domain: string, port: string) {
+  constructor(domain: string, port: string, user: string, apikey: string) {
     const serverId = Math.floor(Math.random() * 999 + 1);
     const sessionId = this.generateSessionId();
     this.domain = domain;
     this.port = port;
     this.url = `ws://${domain}:${port}/sockjs/${serverId}/${sessionId}/websocket`;
+    this.apikey = apikey;
 
     this.socket = new WebSocket(this.url);
     this.socket.onmessage = event => this.handleMessage(event);
+    this.socket.onopen = () => {
+      this.socket.send(`["{\\"auth\\":\\"${user}:${apikey}\\"}"]`);
+    };
   }
 
   public getCurrentFile() {
     if (this.progress && this.progress.path) {
       return fetch(
-        `http://${this.domain}:${this.port}/downloads/files/local/${this.progress.path}`
+        `http://${this.domain}:${this.port}/downloads/files/local/${this.progress.path}`,
+        {
+          headers: {
+            "X-Api-Key": this.apikey
+          }
+        }
       );
     } else return null;
   }
@@ -77,8 +87,10 @@ export default class OctoprintConnection {
   }
 
   private handleMessage(event: MessageEvent) {
+    // console.log("E", event.data);
     if (event.data.startsWith("a")) {
       var payload = JSON.parse(event.data.slice(1));
+      //console.log(payload);
       if (payload.length === 1 && payload[0].current) {
         const data = payload[0].current;
 

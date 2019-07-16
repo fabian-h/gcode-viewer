@@ -39,6 +39,7 @@ const OverlayDiv = styled.div`
 
 interface IProps {
   currentLayer: number;
+  bytesToDraw?: number;
   activeGCode: IGCode;
   transform: ITransform;
   setTransform: (newTransfrom: ITransform) => void;
@@ -54,6 +55,7 @@ export interface ITransform {
 const GCodeViewer = observer(
   ({
     currentLayer,
+    bytesToDraw,
     activeGCode,
     transform,
     setTransform,
@@ -86,6 +88,7 @@ const GCodeViewer = observer(
       drawInstructions(
         context,
         currentLayer,
+        bytesToDraw ? bytesToDraw : undefined,
         activeGCode,
         transform,
         devicePixelRatio,
@@ -151,6 +154,7 @@ export default GCodeViewer;
 function drawInstructions(
   context: CanvasRenderingContext2D,
   layer: number,
+  bytesToDraw: number | undefined,
   activeGCode: IGCode,
   transform: any,
   devicePixelRatio: number,
@@ -181,7 +185,8 @@ function drawInstructions(
     activeGCode.layerPositions[layer + 1],
     drawSettings,
     statistics,
-    undefined
+    undefined,
+    bytesToDraw
   );
 }
 
@@ -192,7 +197,8 @@ function drawLayer(
   to: number,
   drawSettings: IDrawSettings,
   statistics: IStatistics,
-  overrideColor: string | undefined
+  overrideColor: string | undefined,
+  bytesToDraw: number | undefined
 ) {
   let prevX = 0;
   let prevY = 0;
@@ -212,6 +218,8 @@ function drawLayer(
   let command;
   let param1, param2;
 
+  let bytesDrawn = 0;
+
   for (let i = firstBuffer; i <= lastBuffer; ++i) {
     currentF32Buffer = new Float32Array(instructions.buffers[i]);
 
@@ -219,7 +227,11 @@ function drawLayer(
     let end = to - i * instructions.blockSizeInInstructions;
 
     for (let j = offset * 3; j < end * 3; j += 3) {
-      command = currentF32Buffer[j];
+      command = currentF32Buffer[j] & 255;
+      if (bytesToDraw !== undefined) {
+        bytesDrawn += (currentF32Buffer[j] & 4294967041) >> 8;
+        if (bytesDrawn > bytesToDraw) break;
+      }
       param1 = currentF32Buffer[j + 1];
       param2 = currentF32Buffer[j + 2];
 
