@@ -95,7 +95,7 @@ const octoprintAddMachine = Machine({
 async function connectToOctoprint(hostname: string, port: string) {
   try {
     const response = await fetch(
-      `http://${hostname}:${port}/plugin/appkeys/probe`
+      `https://${hostname}:${port}/plugin/appkeys/probe`
     );
     return response.status === 204;
   } catch (e) {
@@ -105,7 +105,7 @@ async function connectToOctoprint(hostname: string, port: string) {
 
 async function pollingForAuth(hostname: string, port: string) {
   const response = await fetch(
-    `http://${hostname}:${port}/plugin/appkeys/request`,
+    `https://${hostname}:${port}/plugin/appkeys/request`,
     {
       mode: "cors",
       method: "POST",
@@ -120,7 +120,7 @@ async function pollingForAuth(hostname: string, port: string) {
   const app_token = (await response.json()).app_token;
   while (true) {
     const pollResponse = await fetch(
-      `http://${hostname}:${port}/plugin/appkeys/request/` + app_token
+      `https://${hostname}:${port}/plugin/appkeys/request/` + app_token
     );
     if (pollResponse.status === 200) {
       const body = await pollResponse.json();
