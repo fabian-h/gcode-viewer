@@ -92,30 +92,35 @@ const octoprintAddMachine = Machine({
   }
 });
 
-async function connectToOctoprint() {
+async function connectToOctoprint(hostname: string, port: string) {
   try {
-    const response = await fetch("http://localhost:5000/plugin/appkeys/probe");
+    const response = await fetch(
+      `http://${hostname}:${port}/plugin/appkeys/probe`
+    );
     return response.status === 204;
   } catch (e) {
     return false;
   }
 }
 
-async function pollingForAuth() {
-  const response = await fetch("http://localhost:5000/plugin/appkeys/request", {
-    mode: "cors",
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      app: "G-Code viewer"
-    })
-  });
+async function pollingForAuth(hostname: string, port: string) {
+  const response = await fetch(
+    `http://${hostname}:${port}/plugin/appkeys/request`,
+    {
+      mode: "cors",
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        app: "G-Code viewer"
+      })
+    }
+  );
   const app_token = (await response.json()).app_token;
   while (true) {
     const pollResponse = await fetch(
-      "http://localhost:5000/plugin/appkeys/request/" + app_token
+      `http://${hostname}:${port}/plugin/appkeys/request/` + app_token
     );
     if (pollResponse.status === 200) {
       const body = await pollResponse.json();
@@ -159,11 +164,10 @@ const OctoprintAddDialog = observer(() => {
           }}
           onSubmit={async values => {
             send("CONNECT");
-            const x = await connectToOctoprint();
-            console.log(x);
+            const x = await connectToOctoprint(values.hostname, values.port);
             if (x) {
               send("CONNECTION_SUCCESS");
-              const apikey = await pollingForAuth();
+              const apikey = await pollingForAuth(values.hostname, values.port);
 
               if (apikey) {
                 const server = { apikey: apikey, ...values };
