@@ -35,9 +35,10 @@ export default class OctoprintConnection {
     const sessionId = this.generateSessionId();
     this.domain = domain;
     this.port = port;
-    this.url = `ws://${domain}:${port}/sockjs/${serverId}/${sessionId}/websocket`;
+    this.url = `wss://${domain}:${port}/sockjs/${serverId}/${sessionId}/websocket`;
     this.apikey = apikey;
 
+    console.log("Open websocket at " + this.url);
     this.socket = new WebSocket(this.url);
     this.socket.onmessage = event => this.handleMessage(event);
     this.socket.onopen = () => {
@@ -48,7 +49,7 @@ export default class OctoprintConnection {
   public getCurrentFile() {
     if (this.progress && this.progress.path) {
       return fetch(
-        `http://${this.domain}:${this.port}/downloads/files/local/${this.progress.path}`,
+        `https://${this.domain}:${this.port}/downloads/files/local/${this.progress.path}`,
         {
           headers: {
             "X-Api-Key": this.apikey
