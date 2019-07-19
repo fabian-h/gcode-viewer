@@ -230,7 +230,14 @@ function drawLayer(
       command = currentF32Buffer[j] & 255;
       if (bytesToDraw !== undefined) {
         bytesDrawn += (currentF32Buffer[j] & 4294967041) >> 8;
-        if (bytesDrawn > bytesToDraw) break;
+        if (bytesDrawn > bytesToDraw && !overrideColor) {
+          context.stroke();
+          context.beginPath();
+          context.moveTo(prevX, prevY);
+          overrideColor = "#ddd";
+          context.lineWidth = context.lineWidth / 2;
+          context.strokeStyle = overrideColor;
+        }
       }
       param1 = currentF32Buffer[j + 1];
       param2 = currentF32Buffer[j + 2];
@@ -247,7 +254,7 @@ function drawLayer(
           prevY = param2;
           break;
         case COMMANDS.SET_FEED_RATE:
-          if (drawSettings.coloringMode === "feed_rate") {
+          if (drawSettings.coloringMode === "feed_rate" && !overrideColor) {
             context.stroke();
             context.beginPath();
             context.moveTo(prevX, prevY);
@@ -255,7 +262,7 @@ function drawLayer(
           }
           break;
         case COMMANDS.TOOL_CHANGE:
-          if (drawSettings.coloringMode === "tool") {
+          if (drawSettings.coloringMode === "tool" && !overrideColor) {
             context.stroke();
             context.beginPath();
             context.moveTo(prevX, prevY);
