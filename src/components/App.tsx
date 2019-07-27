@@ -34,6 +34,8 @@ import DrawSettingsButton from "./DrawSettings";
 import Statistics from "./Statistics";
 import OctoprintAddDialog from "./octoprint/OctoprintAddDialog";
 import OctoprintOverview from "./octoprint/OctoprintOverview";
+import OctoprintFileBrowser from "./octoprint/OctoprintFileBrowser";
+import OctoprintStore from "../app/OctoprintStore";
 
 // See https://blueprintjs.com/docs/#core/accessibility.focus-management
 FocusStyleManager.onlyShowFocusOnTabs();
@@ -91,7 +93,9 @@ const App = observer(IProps => {
           </Navbar.Group>
         </Navbar>
       </TopbarContainer>
-
+      {OctoprintStore.servers[0].config && (
+        <OctoprintFileBrowser config={OctoprintStore.servers[0].config} />
+      )}
       <ViewerContainer>
         {UIStore.activeGCode && UIStore.activeGCode.live ? (
           <LiveGCodeViewer UIStore={UIStore} />
