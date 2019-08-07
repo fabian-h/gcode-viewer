@@ -93,7 +93,7 @@ const App = observer(IProps => {
           </Navbar.Group>
         </Navbar>
       </TopbarContainer>
-      {OctoprintStore.servers[0].config && (
+      {OctoprintStore.servers.length > 0 && OctoprintStore.servers[0].config && (
         <OctoprintFileBrowser config={OctoprintStore.servers[0].config} />
       )}
       <ViewerContainer>
