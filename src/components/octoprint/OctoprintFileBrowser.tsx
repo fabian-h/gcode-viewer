@@ -1,7 +1,22 @@
+/* 
+Copyright 2019 Fabian Hiller
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License. 
+*/
+
 import * as React from "react";
-import { observer } from "mobx-react-lite";
 import { IOctoprintConfig } from "app/OctoprintStore";
-import { Machine, assign } from "xstate";
+import { Machine, assign, interpret } from "xstate";
 import { useMachine } from "@xstate/react";
 
 interface IProps {
@@ -20,12 +35,13 @@ type FileBrowserEvent = { type: "TOGGLE" } | { type: "RETRY" };
 
 interface FileBrowserContext {
   config: IOctoprintConfig;
-  error?: any;
+  files: string[];
+  error: any;
 }
 
-const fileBrowserMachine = (context:any) =>
-  //Machine<FileBrowserContext, FileBrowserSchema, FileBrowserEvent>(
-    Machine(
+const fileBrowserMachine = (context: any) =>
+  Machine<FileBrowserContext, FileBrowserSchema, FileBrowserEvent>(
+    //Machine(
     {
       id: "file_browser",
       initial: "loading",
@@ -33,14 +49,15 @@ const fileBrowserMachine = (context:any) =>
         loading: {
           invoke: {
             id: "load files",
-            src: (context: FileBrowserContext, event:any) =>
+            src: (context: FileBrowserContext, event: any) =>
               listFiles(context.config),
             onDone: {
-              target: "loaded"
+              target: "loaded",
+              actions: ["updateFiles"]
             },
             onError: {
               target: "error",
-              actions: assign({ error: (context:any, event:any) => event.data })
+              actions: ["error"]
             }
           }
         },
@@ -50,22 +67,53 @@ const fileBrowserMachine = (context:any) =>
         }
       }
     },
-    undefined,
-    context
-  );
-
-function listFiles(config: IOctoprintConfig) {
-  return fetch(`https://${config.hostname}:${config.port}/api/files`, {
-    headers: {
-      "X-Api-Key": config.apikey
+    {
+      actions: {
+        error: assign({ error: (context: any, event: any) => "error" }),
+        updateFiles: assign({
+          files: (context: any, event: any) => {
+            console.log("LL", event, context, event.data.files);
+            return event.data.files;
+          }
+        })
+      }
     }
-  });
+  ).withContext(context);
+
+async function listFiles(config: IOctoprintConfig) {
+  var response = await fetch(
+    `${window.location.protocol}//${config.hostname}:${config.port}/api/files`,
+    {
+      headers: {
+        "X-Api-Key": config.apikey
+      }
+    }
+  );
+  return response.json();
 }
 
-const OctoprintFileBrowser = observer(({ config }: IProps) => {
-  const [currentState, send] = useMachine(
-    fileBrowserMachine({ config: config })
+const OctoprintFileBrowser = ({ config }: IProps) => {
+  const machine = fileBrowserMachine({ config: config, files: [] });
+  const [currentState, send] = useMachine(machine);
+  const service = interpret(machine, { devTools: true }).onTransition(state => {
+    console.log(state.value, machine.context);
+  });
+  console.log("FF");
+  service.start();
+
+  return (
+    <>
+      <div>
+        {currentState.matches("error") && <p>Error</p>}
+        {currentState.matches("loaded") && (
+          <ul>
+            {currentState.context.files.map((file: any) => (
+              <li>{file.name}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </>
   );
-  return <div>Bla{currentState.matches("error") && <p>Error</p>}</div>;
-});
+};
 export default OctoprintFileBrowser;

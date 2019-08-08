@@ -43,7 +43,7 @@ FocusStyleManager.onlyShowFocusOnTabs();
 const GridContainer = styled.div`
   background: #eee;
   display: grid;
-  grid-template-columns: 200px minmax(0, 1fr);
+  grid-template-columns: minmax(0px, 200px) minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr) auto;
   width: 100vw;
   height: 100vh;
@@ -58,7 +58,7 @@ const TopbarContainer = styled.div`
 `;
 
 const ViewerContainer = styled.div`
-  grid-column: 1/3;
+  grid-column: 2/3;
   grid-row: 2;
   background: white;
   display: flex;
@@ -68,6 +68,11 @@ const ToolContainer = styled.div`
   grid-column: 1/3;
   grid-row: 3;
   padding: 0 20px 0 20px;
+`;
+
+const SidebarContainer = styled.div`
+  grid-column: 1/2;
+  grid-row: 2;
 `;
 
 interface IProps {}
@@ -93,9 +98,12 @@ const App = observer(IProps => {
           </Navbar.Group>
         </Navbar>
       </TopbarContainer>
-      {OctoprintStore.servers.length > 0 && OctoprintStore.servers[0].config && (
-        <OctoprintFileBrowser config={OctoprintStore.servers[0].config} />
-      )}
+      <SidebarContainer>
+        {OctoprintStore.servers.length > 0 &&
+          OctoprintStore.servers[0].config && (
+            <OctoprintFileBrowser config={OctoprintStore.servers[0].config} />
+          )}
+      </SidebarContainer>
       <ViewerContainer>
         {UIStore.activeGCode && UIStore.activeGCode.live ? (
           <LiveGCodeViewer UIStore={UIStore} />
