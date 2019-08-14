@@ -297,9 +297,17 @@ export default class GCodeParser {
                   if (this.axis_coordinates_absolute)
                     x_coord = this.field_values[X];
                   else x_coord = this.prev_x + this.field_values[X];
-                  if (x_coord > this.statistics.x.max)
+                  if (
+                    command == COMMANDS.MOVE_WITH_EXTRUSION &&
+                    this.prev_z !== 0 &&
+                    x_coord > this.statistics.x.max
+                  )
                     this.statistics.x.max = x_coord;
-                  if (x_coord < this.statistics.x.min)
+                  if (
+                    command == COMMANDS.MOVE_WITH_EXTRUSION &&
+                    this.prev_z !== 0 &&
+                    x_coord < this.statistics.x.min
+                  )
                     this.statistics.x.min = x_coord;
                 } else x_coord = this.prev_x;
 
@@ -308,9 +316,17 @@ export default class GCodeParser {
                   if (this.axis_coordinates_absolute)
                     y_coord = this.field_values[Y];
                   else y_coord = this.prev_y + this.field_values[Y];
-                  if (y_coord > this.statistics.y.max)
+                  if (
+                    command == COMMANDS.MOVE_WITH_EXTRUSION &&
+                    this.prev_z !== 0 &&
+                    y_coord > this.statistics.y.max
+                  )
                     this.statistics.y.max = y_coord;
-                  if (y_coord < this.statistics.y.min)
+                  if (
+                    command == COMMANDS.MOVE_WITH_EXTRUSION &&
+                    this.prev_z !== 0 &&
+                    y_coord < this.statistics.y.min
+                  )
                     this.statistics.y.min = y_coord;
                 } else y_coord = this.prev_y;
                 this.instructions.addInstruction(
