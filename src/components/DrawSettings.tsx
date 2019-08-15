@@ -26,16 +26,15 @@ import {
   Checkbox
 } from "@blueprintjs/core";
 import { useState } from "react";
-import { IDrawSettings } from "app/UIStore";
-import { observer } from "mobx-react-lite";
-import { action } from "mobx";
+import { IDrawSettings } from "app/DrawSettings";
+import { IDrawSettingsAccess } from "app/DrawSettings";
 
 interface IDrawSettingsButtonProps {
   drawSettings: IDrawSettings;
-  setDrawSetting: (setting: keyof IDrawSettings, value: any) => void;
+  setDrawSetting: IDrawSettingsAccess;
 }
 
-const DrawSettingsButton = observer((props: IDrawSettingsButtonProps) => {
+const DrawSettingsButton = (props: IDrawSettingsButtonProps) => {
   const [isOpen, setOpen] = useState(false);
 
   return (
@@ -53,71 +52,67 @@ const DrawSettingsButton = observer((props: IDrawSettingsButtonProps) => {
       />
     </>
   );
-});
+};
 export default DrawSettingsButton;
 
-const SettingsDrawer = observer(
-  ({
-    isOpen,
-    handleClose,
-    ...props
-  }: {
-    isOpen: boolean;
-    handleClose: () => void;
-    drawSettings: IDrawSettings;
-    setDrawSetting: (setting: keyof IDrawSettings, value: any) => void;
-  }) => {
-    return (
-      <Drawer
-        isOpen={isOpen}
-        icon="cog"
-        size="20%"
-        hasBackdrop={false}
-        onClose={handleClose}
-        title="Draw Settings"
-      >
-        <div className={Classes.DRAWER_BODY}>
-          <div className={Classes.DIALOG_BODY}>
-            <DrawSettings {...props} />
-          </div>
+const SettingsDrawer = ({
+  isOpen,
+  handleClose,
+  ...props
+}: {
+  isOpen: boolean;
+  handleClose: () => void;
+  drawSettings: IDrawSettings;
+  setDrawSetting: (setting: keyof IDrawSettings, value: any) => void;
+}) => {
+  return (
+    <Drawer
+      isOpen={isOpen}
+      icon="cog"
+      size="20%"
+      hasBackdrop={false}
+      onClose={handleClose}
+      title="Draw Settings"
+    >
+      <div className={Classes.DRAWER_BODY}>
+        <div className={Classes.DIALOG_BODY}>
+          <DrawSettings {...props} />
         </div>
-      </Drawer>
-    );
-  }
-);
+      </div>
+    </Drawer>
+  );
+};
 
-const DrawSettings = observer(({ drawSettings }: IDrawSettingsButtonProps) => {
+const DrawSettings = ({
+  drawSettings,
+  setDrawSetting
+}: IDrawSettingsButtonProps) => {
   return (
     <div>
       <FormGroup label="Linewidth" labelFor="linewidth-input">
         <NumericInput
           value={drawSettings.lineWidth}
           id="linewidth-input"
-          onValueChange={action(
-            "set line width",
-            (newValue: any) => (drawSettings.lineWidth = newValue)
-          )}
+          onValueChange={newValue => setDrawSetting("lineWidth", newValue)}
         />
       </FormGroup>
       <Checkbox
         checked={drawSettings.scaleLinewidth}
         label="Scale linewidth with zoom"
-        onChange={action(
-          "set line width scaling",
-          (newValue: any) =>
-            (drawSettings.scaleLinewidth = newValue.target.checked)
-        )}
+        onChange={(event: any) =>
+          setDrawSetting("scaleLinewidth", event.target.checked)
+        }
       />
       <RadioGroup
         label="Coloring mode"
         selectedValue={drawSettings.coloringMode}
-        onChange={action("set coloring mode", (changeEvent: any) => {
-          drawSettings.coloringMode = changeEvent.target.value;
-        })}
+        onChange={(event: any) =>
+          setDrawSetting("coloringMode", event.target.value)
+        }
       >
         <Radio label="by feed rate" value="feed_rate" />
         <Radio label="by tool" value="tool" />
       </RadioGroup>
     </div>
   );
-});
+};

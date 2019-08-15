@@ -36,6 +36,7 @@ import OctoprintAddDialog from "./octoprint/OctoprintAddDialog";
 import OctoprintOverview from "./octoprint/OctoprintOverview";
 import OctoprintFileBrowser from "./octoprint/OctoprintFileBrowser";
 import OctoprintStore from "../app/OctoprintStore";
+import { useDrawSettings } from "app/DrawSettings";
 
 // See https://blueprintjs.com/docs/#core/accessibility.focus-management
 FocusStyleManager.onlyShowFocusOnTabs();
@@ -77,7 +78,8 @@ const SidebarContainer = styled.div`
 
 interface IProps {}
 
-const App = observer(IProps => {
+const App = observer(() => {
+  const [drawSettings, setDrawSetting] = useDrawSettings();
   return (
     //<React.StrictMode>
     <GridContainer>
@@ -88,8 +90,8 @@ const App = observer(IProps => {
             <Navbar.Divider />
 
             <DrawSettingsButton
-              drawSettings={UIStore.drawSettings}
-              setDrawSetting={UIStore.setDrawSetting}
+              drawSettings={drawSettings}
+              setDrawSetting={setDrawSetting}
             />
             <OctoprintAddDialog />
             {UIStore.activeGCode && (
@@ -108,7 +110,7 @@ const App = observer(IProps => {
         {UIStore.activeGCode && UIStore.activeGCode.live ? (
           <LiveGCodeViewer UIStore={UIStore} />
         ) : (
-          <StaticGCodeViewer UIStore={UIStore} />
+          <StaticGCodeViewer UIStore={UIStore} drawSettings={drawSettings} />
         )}
         <OctoprintOverview />
       </ViewerContainer>

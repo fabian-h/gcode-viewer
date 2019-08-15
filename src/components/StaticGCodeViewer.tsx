@@ -15,7 +15,7 @@ limitations under the License.
 */
 
 import * as React from "react";
-import { UIStore } from "app/UIStore";
+import { UIStore, IDrawSettings } from "app/UIStore";
 import GCodeViewer from "./GCodeViewer";
 import { observer } from "mobx-react-lite";
 import { GCodeDropzone } from "./GCodeDropzone";
@@ -24,6 +24,7 @@ import styled from "styled-components";
 
 interface IProps {
   UIStore: UIStore;
+  drawSettings: IDrawSettings;
 }
 const StyledDiv = styled.div`
   flex: 1;
@@ -32,7 +33,8 @@ const StyledDiv = styled.div`
 
 const StaticGCodeViewer = observer(
   ({
-    UIStore: { activeGCode, activeLayer, transform, setTransform, drawSettings }
+    UIStore: { activeGCode, activeLayer, transform, setTransform },
+    drawSettings
   }: IProps) => {
     const [isDragging, setDragging] = useState<boolean>(false);
 
