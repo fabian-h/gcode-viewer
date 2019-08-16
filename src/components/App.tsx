@@ -108,7 +108,7 @@ const App = observer(() => {
       </SidebarContainer>
       <ViewerContainer>
         {UIStore.activeGCode && UIStore.activeGCode.live ? (
-          <LiveGCodeViewer UIStore={UIStore} />
+          <LiveGCodeViewer UIStore={UIStore} drawSettings={drawSettings} />
         ) : (
           <StaticGCodeViewer UIStore={UIStore} drawSettings={drawSettings} />
         )}

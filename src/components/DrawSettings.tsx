@@ -99,7 +99,7 @@ const DrawSettings = ({
       <Checkbox
         checked={drawSettings.scaleLinewidth}
         label="Scale linewidth with zoom"
-        onChange={(event: any) =>
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
           setDrawSetting("scaleLinewidth", event.target.checked)
         }
       />

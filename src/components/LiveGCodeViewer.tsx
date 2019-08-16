@@ -15,17 +15,19 @@ limitations under the License.
 */
 
 import * as React from "react";
-import { UIStore, IGCode } from "app/UIStore";
+import { UIStore, IGCode, IDrawSettings } from "app/UIStore";
 import GCodeViewer from "./GCodeViewer";
 import { observer } from "mobx-react-lite";
 
 interface IProps {
   UIStore: UIStore;
+  drawSettings: IDrawSettings;
 }
 
 const LiveGCodeViewer = observer(
   ({
-    UIStore: { activeGCode, transform, setTransform, drawSettings }
+    UIStore: { activeGCode, transform, setTransform },
+    drawSettings
   }: IProps) => {
     if (
       activeGCode &&

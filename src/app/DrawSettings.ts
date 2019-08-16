@@ -30,16 +30,14 @@ function updateSettings(
     name: K,
     value: IDrawSettings[K]
   ) {
-    let newSettings: IDrawSettings = { ...oldSettings };
-    newSettings[name] = value;
+    const newSettings = produce(oldSettings, (draft: IDrawSettings) => {
+      draft[name] = value;
+    });
     updateFunction(newSettings);
   };
-
-  //return produce(oldSettings, settings => settings[name] = value);
 }
 
 export function useDrawSettings(): [IDrawSettings, IDrawSettingsAccess] {
   const [settings, setSettings] = useState(defaultDrawSettings);
-  const [rv1, rv2] = [settings, updateSettings(setSettings, settings)];
-  return [rv1, rv2];
+  return [settings, updateSettings(setSettings, settings)];
 }
