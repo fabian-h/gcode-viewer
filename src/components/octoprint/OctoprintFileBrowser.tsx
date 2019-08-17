@@ -15,8 +15,10 @@ limitations under the License.
 */
 
 import * as React from "react";
-import { IOctoprintConfig } from "app/OctoprintStore";
+
 import { Machine, assign, interpret } from "xstate";
+
+import { IOctoprintConfig } from "app/OctoprintStore";
 import { useMachine } from "@xstate/react";
 
 interface IProps {
@@ -72,7 +74,6 @@ const fileBrowserMachine = (context: any) =>
         error: assign({ error: (context: any, event: any) => "error" }),
         updateFiles: assign({
           files: (context: any, event: any) => {
-            console.log("LL", event, context, event.data.files);
             return event.data.files;
           }
         })
@@ -96,9 +97,8 @@ const OctoprintFileBrowser = ({ config }: IProps) => {
   const machine = fileBrowserMachine({ config: config, files: [] });
   const [currentState, send] = useMachine(machine);
   const service = interpret(machine, { devTools: true }).onTransition(state => {
-    console.log(state.value, machine.context);
+    //console.log(state.value, machine.context);
   });
-  console.log("FF");
   service.start();
 
   return (

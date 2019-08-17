@@ -15,7 +15,9 @@ limitations under the License.
 */
 
 import * as React from "react";
-import { UIStore, IGCode, IDrawSettings } from "app/UIStore";
+
+import { IDrawSettings, IGCode, UIStore } from "app/UIStore";
+
 import GCodeViewer from "./GCodeViewer";
 import { observer } from "mobx-react-lite";
 

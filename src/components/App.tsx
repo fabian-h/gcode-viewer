@@ -14,28 +14,27 @@ See the License for the specific language governing permissions and
 limitations under the License. 
 */
 
-import { FocusStyleManager } from "@blueprintjs/core";
-
 import "normalize.css/normalize.css";
 import "@blueprintjs/core/lib/css/blueprint.css";
 
 import * as React from "react";
-import { FormGroup, Navbar, Alignment } from "@blueprintjs/core";
 
-import styled from "styled-components";
-import { Slider } from "@blueprintjs/core";
-import { observer } from "mobx-react-lite";
-import UIStore from "app/UIStore";
+import { Alignment, FormGroup, Navbar } from "@blueprintjs/core";
 
-import LiveGCodeViewer from "./LiveGCodeViewer";
-import StaticGCodeViewer from "./StaticGCodeViewer";
 import DrawSettingsButton from "./DrawSettings";
-
-import Statistics from "./Statistics";
+import { FocusStyleManager } from "@blueprintjs/core";
+import GCodeViewerUI from "./viewer/GCodeViewerUI";
+import LiveGCodeViewer from "./LiveGCodeViewer";
 import OctoprintAddDialog from "./octoprint/OctoprintAddDialog";
-import OctoprintOverview from "./octoprint/OctoprintOverview";
 import OctoprintFileBrowser from "./octoprint/OctoprintFileBrowser";
+import OctoprintOverview from "./octoprint/OctoprintOverview";
 import OctoprintStore from "../app/OctoprintStore";
+import { Slider } from "@blueprintjs/core";
+import StaticGCodeViewer from "./StaticGCodeViewer";
+import Statistics from "./Statistics";
+import UIStore from "app/UIStore";
+import { observer } from "mobx-react-lite";
+import styled from "styled-components/macro";
 import { useDrawSettings } from "app/DrawSettings";
 
 // See https://blueprintjs.com/docs/#core/accessibility.focus-management
@@ -107,29 +106,17 @@ const App = observer(() => {
           )}
       </SidebarContainer>
       <ViewerContainer>
-        {UIStore.activeGCode && UIStore.activeGCode.live ? (
+        {/*UIStore.activeGCode && UIStore.activeGCode.live ? (
           <LiveGCodeViewer UIStore={UIStore} drawSettings={drawSettings} />
         ) : (
           <StaticGCodeViewer UIStore={UIStore} drawSettings={drawSettings} />
-        )}
+        )*/}
+        <GCodeViewerUI
+          GCode={UIStore.activeGCode}
+          drawSettings={drawSettings}
+        />
         <OctoprintOverview />
       </ViewerContainer>
-      {UIStore.activeGCode && !UIStore.activeGCode.live ? (
-        <ToolContainer>
-          <FormGroup label="Current layer">
-            <Slider
-              value={UIStore.activeLayer}
-              min={0}
-              max={
-                UIStore.numberOfLayers !== 0 ? UIStore.numberOfLayers - 2 : 100
-              }
-              disabled={UIStore.numberOfLayers === 0}
-              labelStepSize={Math.ceil(1 + UIStore.numberOfLayers / 200) * 10}
-              onChange={n => UIStore.setActiveLayer(n)}
-            />
-          </FormGroup>
-        </ToolContainer>
-      ) : null}
     </GridContainer>
     //</React.StrictMode>
   );

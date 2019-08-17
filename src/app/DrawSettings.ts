@@ -1,5 +1,5 @@
-import { useState } from "react";
 import produce from "immer";
+import { useState } from "react";
 
 export interface IDrawSettings {
   lineWidth: number;

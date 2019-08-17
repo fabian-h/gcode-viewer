@@ -29,20 +29,6 @@ export class UIStore {
   @observable
   trackProgress: boolean = false;
 
-  @observable
-  drawSettings: IDrawSettings = {
-    lineWidth: 8,
-    coloringMode: "feed_rate",
-    toolColors: ["blue", "green", "red", "orange", "black"],
-    scaleLinewidth: true,
-    drawPreviousLayers: 2
-  };
-
-  @action.bound
-  setDrawSetting(setting: keyof IDrawSettings, value: any) {
-    //this.drawSettings[setting] = value;
-  }
-
   @computed
   get numberOfLayers() {
     return this.activeGCode === null ? 0 : this.activeGCode.numberOfLayers;

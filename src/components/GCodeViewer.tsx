@@ -15,17 +15,17 @@ limitations under the License.
 */
 
 import * as React from "react";
-import { Instructions, COMMANDS, IStatistics } from "app/gcode-parser";
-import { zoom } from "d3-zoom";
-import { select, event } from "d3-selection";
-import { scaleLinear } from "d3-scale";
-import { interpolateInferno } from "d3-scale-chromatic";
-import { observer } from "mobx-react-lite";
-import styled from "styled-components";
-import { IGCode, IDrawSettings } from "app/UIStore";
-import { action } from "mobx";
-import { useState, useEffect, useRef } from "react";
+
+import { COMMANDS, IStatistics, Instructions } from "app/gcode-parser";
+import { IDrawSettings, IGCode } from "app/UIStore";
+import { event, select } from "d3-selection";
+import { useEffect, useRef, useState } from "react";
+import { zoom, zoomIdentity } from "d3-zoom";
+
 import { ResizeSensor } from "@blueprintjs/core";
+import { interpolateInferno } from "d3-scale-chromatic";
+import { scaleLinear } from "d3-scale";
+import styled from "styled-components/macro";
 
 const StyledCanvas = styled.canvas`
   flex: 1;
@@ -52,103 +52,92 @@ export interface ITransform {
   y: number;
 }
 
-const GCodeViewer = observer(
-  ({
-    currentLayer,
-    bytesToDraw,
-    activeGCode,
-    transform,
-    setTransform,
-    drawSettings
-  }: IProps) => {
-    const [context, setContext] = useState<CanvasRenderingContext2D | null>(
-      null
+const GCodeViewer = ({
+  currentLayer,
+  bytesToDraw,
+  activeGCode,
+  transform,
+  setTransform,
+  drawSettings
+}: IProps) => {
+  const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
+
+  let canvas = useRef<HTMLCanvasElement>(null);
+
+  function draw() {
+    if (canvas.current === null || context === null || activeGCode === null) {
+      return;
+    }
+
+    // set the actual D3 tranform to the same value as our transform state
+    // otherwise external actions that modify transfrom like the "reset zoom"
+    // button are not reflected in the actual zoom
+    zoom().transform(
+      select(canvas.current as any),
+      zoomIdentity.translate(transform.x, transform.y).scale(transform.k)
     );
 
-    let canvas = useRef<HTMLCanvasElement>(null);
-
-    const doZoom = action("update transform", () => {
-      /*const { k, x, y } = event.transform;
-      set(transform, "x", x);
-      set(transform, "y", y);
-      set(transform, "k", k);
-      transform.x = x;
-      transform.y = y;
-      transform.k = k;*/
-      //transform = { k, x, y };
-      setTransform(event.transform);
-    });
-
-    function draw() {
-      if (canvas.current === null || context === null || activeGCode === null) {
-        return;
-      }
-
-      clearCanvas(canvas.current, context);
-      drawInstructions(
-        context,
-        currentLayer,
-        bytesToDraw ? bytesToDraw : undefined,
-        activeGCode,
-        transform,
-        devicePixelRatio,
-        drawSettings,
-        activeGCode.statistics
-      );
-    }
-
-    function handleResize() {
-      if (canvas.current === null) return;
-
-      const currentHeight = canvas.current.clientHeight;
-      const currentWidth = canvas.current.clientWidth;
-      var devicePixelRatio = window.devicePixelRatio || 1;
-      if (
-        canvas.current.width !== currentWidth * devicePixelRatio ||
-        canvas.current.height !== currentHeight * devicePixelRatio
-      ) {
-        canvas.current.width = currentWidth * devicePixelRatio;
-        canvas.current.height = currentHeight * devicePixelRatio;
-      }
-      draw();
-    }
-
-    useEffect(() => {
-      if (context) {
-        draw();
-      } else {
-        if (canvas.current) setContext(canvas.current.getContext("2d"));
-
-        const zoomBehaviour = zoom()
-          .on("zoom", doZoom)
-          .scaleExtent([1, 128]);
-
-        if (canvas.current !== null)
-          zoomBehaviour(select(canvas.current as any));
-
-        //handleResize();
-      }
-    });
-
-    // hack to get mobx to notice we use this Observable
-    var tmp = drawSettings.lineWidth;
-    var tmp2 = drawSettings.coloringMode;
-    var tmp3 = drawSettings.scaleLinewidth;
-
-    return (
-      <ResizeSensor onResize={handleResize}>
-        <>
-          <OverlayDiv>
-            Layer {currentLayer}
-            <br />
-            Layer height: {activeGCode.layerHeights[currentLayer].toFixed(2)}
-          </OverlayDiv>
-          <StyledCanvas ref={canvas} />
-        </>
-      </ResizeSensor>
+    clearCanvas(canvas.current, context);
+    drawInstructions(
+      context,
+      currentLayer,
+      bytesToDraw ? bytesToDraw : undefined,
+      activeGCode,
+      transform,
+      devicePixelRatio,
+      drawSettings,
+      activeGCode.statistics
     );
   }
-);
+
+  function handleResize() {
+    if (canvas.current === null) return;
+
+    const currentHeight = canvas.current.clientHeight;
+    const currentWidth = canvas.current.clientWidth;
+    var devicePixelRatio = window.devicePixelRatio || 1;
+    if (
+      canvas.current.width !== currentWidth * devicePixelRatio ||
+      canvas.current.height !== currentHeight * devicePixelRatio
+    ) {
+      canvas.current.width = currentWidth * devicePixelRatio;
+      canvas.current.height = currentHeight * devicePixelRatio;
+    }
+    draw();
+  }
+
+  const doZoom = () => setTransform(event.transform);
+
+  useEffect(() => {
+    if (context) {
+      draw();
+    } else {
+      if (canvas.current) setContext(canvas.current.getContext("2d"));
+
+      const zoomBehaviour = zoom()
+        .on("zoom", doZoom)
+        .scaleExtent([1, 128]);
+
+      if (canvas.current !== null) {
+        const CanvasElement = select(canvas.current as any);
+        zoomBehaviour(CanvasElement);
+      }
+    }
+  });
+
+  return (
+    <ResizeSensor onResize={handleResize}>
+      <>
+        <OverlayDiv>
+          Layer {currentLayer}
+          <br />
+          Layer height: {activeGCode.layerHeights[currentLayer].toFixed(2)}
+        </OverlayDiv>
+        <StyledCanvas ref={canvas} />
+      </>
+    </ResizeSensor>
+  );
+};
 export default GCodeViewer;
 
 function drawInstructions(

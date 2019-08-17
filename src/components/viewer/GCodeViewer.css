@@ -1,0 +1,37 @@
+.gcode-viewer_container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-content: stretch;
+}
+
+.gcode-viewer_container canvas {
+  min-height: 0;
+}
+
+.gcode-viewer_toolbar-container {
+  flex: 0 0 auto;
+  padding: 5px;
+  display: flex;
+  flex-direction: row;
+}
+
+.gcode-viewer_toolbar-button {
+  flex: 0 0 auto;
+  margin: 0 5px;
+}
+
+.gcode-viewer_toolbar-layer-input {
+  flex: 0 0 85px;
+  margin: 0 5px;
+}
+
+.gcode-viewer_toolbar-layer-input .bp3-input-group {
+  flex-shrink: 1;
+}
+
+.gcode-viewer_toolbar-flex-grow {
+  flex: 1;
+  margin: 0 5px;
+}

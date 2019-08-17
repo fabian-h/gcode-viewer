@@ -15,10 +15,11 @@ limitations under the License.
 */
 
 import React, { useCallback } from "react";
-import { useDropzone } from "react-dropzone";
-import styled from "styled-components";
-import { uploadGCodeFiles } from "app/file-upload";
+
 import UIStore from "app/UIStore";
+import styled from "styled-components/macro";
+import { uploadGCodeFiles } from "app/file-upload";
+import { useDropzone } from "react-dropzone";
 
 const DropzoneContainer = styled.div`
   flex: 1;
@@ -43,7 +44,7 @@ const CenteredParagraph = styled.p`
 `;
 
 interface IProps {
-  onFileLoad: () => void;
+  onFileLoad?: () => void;
 }
 
 export function GCodeDropzone({ onFileLoad }: IProps) {

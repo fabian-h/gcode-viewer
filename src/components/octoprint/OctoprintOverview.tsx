@@ -1,11 +1,12 @@
-import { observer } from "mobx-react-lite";
-import React from "react";
+import { Button, Card } from "@blueprintjs/core";
 import OctoprintStore, { IOctoprintServer } from "app/OctoprintStore";
-import { Card, Button } from "@blueprintjs/core";
-import styled from "styled-components";
-import OctoprintConnection from "app/OctoprintConnection";
-import UIStore from "app/UIStore";
+
 import GCodeParser from "app/gcode-parser";
+import OctoprintConnection from "app/OctoprintConnection";
+import React from "react";
+import UIStore from "app/UIStore";
+import { observer } from "mobx-react-lite";
+import styled from "styled-components/macro";
 
 interface IProps {}
 

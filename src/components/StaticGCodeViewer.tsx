@@ -15,12 +15,14 @@ limitations under the License.
 */
 
 import * as React from "react";
-import { UIStore, IDrawSettings } from "app/UIStore";
+
+import { IDrawSettings, UIStore } from "app/UIStore";
+
+import { GCodeDropzone } from "./GCodeDropzone";
 import GCodeViewer from "./GCodeViewer";
 import { observer } from "mobx-react-lite";
-import { GCodeDropzone } from "./GCodeDropzone";
+import styled from "styled-components/macro";
 import { useState } from "react";
-import styled from "styled-components";
 
 interface IProps {
   UIStore: UIStore;

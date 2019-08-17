@@ -15,20 +15,22 @@ limitations under the License.
 */
 
 import * as React from "react";
-import { observer } from "mobx-react-lite";
-import OctoprintStore from "app/OctoprintStore";
-import { Formik, Form, Field, FieldProps, ErrorMessage } from "formik";
-import {
-  Dialog,
-  Button,
-  Classes,
-  FormGroup,
-  InputGroup,
-  Callout
-} from "@blueprintjs/core";
-import styled from "styled-components";
 import * as Yup from "yup";
+
+import {
+  Button,
+  Callout,
+  Classes,
+  Dialog,
+  FormGroup,
+  InputGroup
+} from "@blueprintjs/core";
+import { ErrorMessage, Field, FieldProps, Form, Formik } from "formik";
 import { Machine, interpret } from "xstate";
+
+import OctoprintStore from "app/OctoprintStore";
+import { observer } from "mobx-react-lite";
+import styled from "styled-components/macro";
 import { useMachine } from "@xstate/react";
 import { useState } from "react";
 
@@ -120,7 +122,8 @@ async function pollingForAuth(hostname: string, port: string) {
   const app_token = (await response.json()).app_token;
   while (true) {
     const pollResponse = await fetch(
-      `${window.location.protocol}//${hostname}:${port}/plugin/appkeys/request/` + app_token
+      `${window.location.protocol}//${hostname}:${port}/plugin/appkeys/request/` +
+        app_token
     );
     if (pollResponse.status === 200) {
       const body = await pollResponse.json();
