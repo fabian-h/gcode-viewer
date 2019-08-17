@@ -44,6 +44,8 @@ interface IProps {
   transform: ITransform;
   setTransform: (newTransfrom: ITransform) => void;
   drawSettings: IDrawSettings;
+  setWidth: (width: number) => void;
+  setHeight: (height: number) => void;
 }
 
 export interface ITransform {
@@ -58,14 +60,22 @@ const GCodeViewer = ({
   activeGCode,
   transform,
   setTransform,
-  drawSettings
+  drawSettings,
+  setWidth,
+  setHeight
 }: IProps) => {
   const [context, setContext] = useState<CanvasRenderingContext2D | null>(null);
 
   let canvas = useRef<HTMLCanvasElement>(null);
 
   function draw() {
-    if (canvas.current === null || context === null || activeGCode === null) {
+    if (
+      canvas.current === null ||
+      context === null ||
+      activeGCode === null ||
+      canvas.current.clientHeight === 0 ||
+      canvas.current.clientWidth === 0
+    ) {
       return;
     }
 
@@ -91,6 +101,7 @@ const GCodeViewer = ({
   }
 
   function handleResize() {
+    console.log("resizse");
     if (canvas.current === null) return;
 
     const currentHeight = canvas.current.clientHeight;
@@ -102,11 +113,15 @@ const GCodeViewer = ({
     ) {
       canvas.current.width = currentWidth * devicePixelRatio;
       canvas.current.height = currentHeight * devicePixelRatio;
+      setWidth(currentWidth * devicePixelRatio);
+      setHeight(currentHeight * devicePixelRatio);
     }
-    draw();
+    //draw();
   }
 
-  const doZoom = () => setTransform(event.transform);
+  const doZoom = () => {
+    setTransform(event.transform);
+  };
 
   useEffect(() => {
     if (context) {
@@ -126,16 +141,16 @@ const GCodeViewer = ({
   });
 
   return (
-    <ResizeSensor onResize={handleResize}>
-      <>
-        <OverlayDiv>
-          Layer {currentLayer}
-          <br />
-          Layer height: {activeGCode.layerHeights[currentLayer].toFixed(2)}
-        </OverlayDiv>
+    <>
+      <OverlayDiv>
+        Layer {currentLayer}
+        <br />
+        Layer height: {activeGCode.layerHeights[currentLayer].toFixed(2)}
+      </OverlayDiv>
+      <ResizeSensor onResize={handleResize}>
         <StyledCanvas ref={canvas} />
-      </>
-    </ResizeSensor>
+      </ResizeSensor>
+    </>
   );
 };
 export default GCodeViewer;

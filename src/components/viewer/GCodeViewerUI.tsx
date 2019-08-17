@@ -4,13 +4,12 @@ import * as React from "react";
 
 import { Button, NumericInput } from "@blueprintjs/core";
 import GCodeViewer, { ITransform } from "components/GCodeViewer";
+import { useEffect, useState } from "react";
 
 import { GCodeDropzone } from "components/GCodeDropzone";
 import { IDrawSettings } from "app/DrawSettings";
 import { IGCode } from "app/UIStore";
 import LayerSelectionSlider from "./LayerSelectionSlider";
-import styled from "styled-components/macro";
-import { useState } from "react";
 
 /*
 const ContainerDiv = styled.div`
@@ -54,6 +53,23 @@ interface IProps {
 export default ({ GCode, drawSettings }: IProps) => {
   const [currentLayer, setCurrentLayer] = useState<number>(1);
   const [transform, setTransform] = useState<ITransform>({ k: 1, x: 0, y: 0 });
+  const [width, setWidth] = useState<number>(0);
+  const [height, setHeight] = useState<number>(0);
+
+  useEffect(() => {
+    if (GCode !== null) {
+      const initialTransform = calculateTransfromFromCoordinates(
+        GCode.statistics.x.min,
+        GCode.statistics.x.max,
+        GCode.statistics.y.min,
+        GCode.statistics.y.max,
+        width,
+        height
+      );
+
+      setTransform(initialTransform);
+    }
+  }, [GCode, width, height]);
 
   if (GCode === null) return <GCodeDropzone />;
 
@@ -65,6 +81,8 @@ export default ({ GCode, drawSettings }: IProps) => {
         transform={transform}
         setTransform={setTransform}
         drawSettings={drawSettings}
+        setWidth={setWidth}
+        setHeight={setHeight}
       />
       <div className="gcode-viewer_toolbar-container">
         <Button
@@ -94,3 +112,25 @@ export default ({ GCode, drawSettings }: IProps) => {
     </div>
   );
 };
+
+function calculateTransfromFromCoordinates(
+  xmin: number,
+  xmax: number,
+  ymin: number,
+  ymax: number,
+  width: number,
+  height: number
+) {
+  const dx = xmax - xmin;
+  const dy = ymax - ymin;
+  const x = (xmin + xmax) / 2;
+  const y = (ymin + ymax) / 2;
+
+  const scale = Math.max(1, 0.9 / Math.max(dx / width, dy / height));
+  const translate = [width / 2 - scale * x, height / 2 - scale * y];
+  return {
+    k: scale,
+    x: translate[0],
+    y: translate[1]
+  };
+}
