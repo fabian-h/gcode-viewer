@@ -31,12 +31,6 @@ const StyledCanvas = styled.canvas`
   flex: 1;
 `;
 
-const OverlayDiv = styled.div`
-  position: absolute;
-  padding: 5px;
-  background-color: transparent;
-`;
-
 interface IProps {
   currentLayer: number;
   bytesToDraw?: number;
@@ -141,16 +135,9 @@ const GCodeViewer = ({
   });
 
   return (
-    <>
-      <OverlayDiv>
-        Layer {currentLayer}
-        <br />
-        Layer height: {activeGCode.layerHeights[currentLayer].toFixed(2)}
-      </OverlayDiv>
-      <ResizeSensor onResize={handleResize}>
-        <StyledCanvas ref={canvas} />
-      </ResizeSensor>
-    </>
+    <ResizeSensor onResize={handleResize}>
+      <StyledCanvas ref={canvas} />
+    </ResizeSensor>
   );
 };
 export default GCodeViewer;

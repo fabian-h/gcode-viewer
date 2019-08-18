@@ -14,7 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License. 
 */
 
-import React, { useCallback } from "react";
+import { GCodeContext, useGCodeContext } from "app/GCodeProvider";
+import React, { useCallback, useContext } from "react";
 
 import UIStore from "app/UIStore";
 import styled from "styled-components/macro";
@@ -48,10 +49,13 @@ interface IProps {
 }
 
 export function GCodeDropzone({ onFileLoad }: IProps) {
+  const GCodeStore = useGCodeContext();
+
   const onDrop = useCallback(async acceptedFiles => {
     UIStore.setActiveGCode(null);
     const gcode = await uploadGCodeFiles(acceptedFiles);
     UIStore.setActiveGCode(gcode);
+    GCodeStore.addGCode(gcode);
     if (onFileLoad) onFileLoad();
   }, []);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });

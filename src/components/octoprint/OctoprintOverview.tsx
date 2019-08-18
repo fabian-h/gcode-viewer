@@ -16,8 +16,8 @@ const StyledCard = styled(Card)`
 
 const OverviewContainer = styled.div`
   position: absolute;
-  right: 15px;
-  top: 65px;
+  right: 20px;
+  top: 120px;
 `;
 
 async function handlePreview(connection: OctoprintConnection) {

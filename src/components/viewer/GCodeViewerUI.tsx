@@ -3,13 +3,15 @@ import "./GCodeViewer.css";
 import * as React from "react";
 
 import { Button, NumericInput } from "@blueprintjs/core";
+import { GCodeContext, useGCodeContext } from "app/GCodeProvider";
 import GCodeViewer, { ITransform } from "components/GCodeViewer";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { GCodeDropzone } from "components/GCodeDropzone";
 import { IDrawSettings } from "app/DrawSettings";
 import { IGCode } from "app/UIStore";
 import LayerSelectionSlider from "./LayerSelectionSlider";
+import SelectionBar from "./SelectionBar";
 
 /*
 const ContainerDiv = styled.div`
@@ -56,6 +58,9 @@ export default ({ GCode, drawSettings }: IProps) => {
   const [width, setWidth] = useState<number>(0);
   const [height, setHeight] = useState<number>(0);
 
+  const GCodeStore = useGCodeContext();
+  console.log("store", GCodeStore);
+
   useEffect(() => {
     if (GCode !== null) {
       const initialTransform = calculateTransfromFromCoordinates(
@@ -75,6 +80,7 @@ export default ({ GCode, drawSettings }: IProps) => {
 
   return (
     <div className="gcode-viewer_container">
+      <SelectionBar gcodes={GCodeStore.gcodes} addGCode={GCodeStore.addGCode} />
       <GCodeViewer
         currentLayer={currentLayer}
         activeGCode={GCode}
@@ -84,6 +90,11 @@ export default ({ GCode, drawSettings }: IProps) => {
         setWidth={setWidth}
         setHeight={setHeight}
       />
+      <div className="gcode-viewer_overlay">
+        Layer {currentLayer}
+        <br />
+        Layer height: {GCode.layerHeights[currentLayer].toFixed(2)} mm
+      </div>
       <div className="gcode-viewer_toolbar-container">
         <Button
           className="gcode-viewer_toolbar-button"

@@ -14,36 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License. 
 */
 
-import { observable, action, computed } from "mobx";
-import { Instructions, IStatistics } from "./gcode-parser";
+import { IStatistics, Instructions } from "./gcode-parser";
+import { action, computed, observable } from "mobx";
+
 import { ITransform } from "components/GCodeViewer";
 import OctoprintConnection from "./OctoprintConnection";
 
 export class UIStore {
-  @observable
-  transform: ITransform = { k: 1, x: 0, y: 0 };
-
-  @observable
-  activeLayer: number = 0;
-
-  @observable
-  trackProgress: boolean = false;
-
-  @computed
-  get numberOfLayers() {
-    return this.activeGCode === null ? 0 : this.activeGCode.numberOfLayers;
-  }
-
-  @action
-  setActiveLayer(n: number) {
-    this.activeLayer = n;
-  }
-
-  @action.bound
-  setTransform(newTransform: ITransform) {
-    this.transform = newTransform;
-  }
-
   @action
   setActiveGCode(gcode: IGCode | null) {
     /*if (gcode) {
@@ -54,7 +31,6 @@ export class UIStore {
       });
     }*/
     this.activeGCode = gcode;
-    this.activeLayer = 1;
   }
 
   @observable.ref

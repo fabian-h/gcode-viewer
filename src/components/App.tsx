@@ -19,17 +19,17 @@ import "@blueprintjs/core/lib/css/blueprint.css";
 
 import * as React from "react";
 
-import { Alignment, FormGroup, Navbar } from "@blueprintjs/core";
+import { Alignment, Navbar } from "@blueprintjs/core";
 
 import DrawSettingsButton from "./DrawSettings";
 import { FocusStyleManager } from "@blueprintjs/core";
+import GCodeProvider from "app/GCodeProvider";
 import GCodeViewerUI from "./viewer/GCodeViewerUI";
 //import LiveGCodeViewer from "./LiveGCodeViewer";
 import OctoprintAddDialog from "./octoprint/OctoprintAddDialog";
 import OctoprintFileBrowser from "./octoprint/OctoprintFileBrowser";
 import OctoprintOverview from "./octoprint/OctoprintOverview";
 import OctoprintStore from "../app/OctoprintStore";
-import { Slider } from "@blueprintjs/core";
 //import StaticGCodeViewer from "./StaticGCodeViewer";
 import Statistics from "./Statistics";
 import UIStore from "app/UIStore";
@@ -81,43 +81,45 @@ const App = observer(() => {
   const [drawSettings, setDrawSetting] = useDrawSettings();
   return (
     //<React.StrictMode>
-    <GridContainer>
-      <TopbarContainer>
-        <Navbar className="bp3-dark">
-          <Navbar.Group align={Alignment.LEFT}>
-            <Navbar.Heading>G-Code viewer for 3D printing</Navbar.Heading>
-            <Navbar.Divider />
+    <GCodeProvider>
+      <GridContainer>
+        <TopbarContainer>
+          <Navbar className="bp3-dark">
+            <Navbar.Group align={Alignment.LEFT}>
+              <Navbar.Heading>G-Code viewer for 3D printing</Navbar.Heading>
+              <Navbar.Divider />
 
-            <DrawSettingsButton
-              drawSettings={drawSettings}
-              setDrawSetting={setDrawSetting}
-            />
-            <OctoprintAddDialog />
-            {UIStore.activeGCode && (
-              <Statistics statistics={UIStore.activeGCode.statistics} />
+              <DrawSettingsButton
+                drawSettings={drawSettings}
+                setDrawSetting={setDrawSetting}
+              />
+              <OctoprintAddDialog />
+              {UIStore.activeGCode && (
+                <Statistics statistics={UIStore.activeGCode.statistics} />
+              )}
+            </Navbar.Group>
+          </Navbar>
+        </TopbarContainer>
+        <SidebarContainer>
+          {OctoprintStore.servers.length > 0 &&
+            OctoprintStore.servers[0].config && (
+              <OctoprintFileBrowser config={OctoprintStore.servers[0].config} />
             )}
-          </Navbar.Group>
-        </Navbar>
-      </TopbarContainer>
-      <SidebarContainer>
-        {OctoprintStore.servers.length > 0 &&
-          OctoprintStore.servers[0].config && (
-            <OctoprintFileBrowser config={OctoprintStore.servers[0].config} />
-          )}
-      </SidebarContainer>
-      <ViewerContainer>
-        {/*UIStore.activeGCode && UIStore.activeGCode.live ? (
+        </SidebarContainer>
+        <ViewerContainer>
+          {/*UIStore.activeGCode && UIStore.activeGCode.live ? (
           <LiveGCodeViewer UIStore={UIStore} drawSettings={drawSettings} />
         ) : (
           <StaticGCodeViewer UIStore={UIStore} drawSettings={drawSettings} />
         )*/}
-        <GCodeViewerUI
-          GCode={UIStore.activeGCode}
-          drawSettings={drawSettings}
-        />
-        <OctoprintOverview />
-      </ViewerContainer>
-    </GridContainer>
+          <GCodeViewerUI
+            GCode={UIStore.activeGCode}
+            drawSettings={drawSettings}
+          />
+          <OctoprintOverview />
+        </ViewerContainer>
+      </GridContainer>
+    </GCodeProvider>
     //</React.StrictMode>
   );
 });

@@ -4,10 +4,18 @@
   flex-direction: column;
   justify-content: space-between;
   align-content: stretch;
+  position: relative;
 }
 
 .gcode-viewer_container canvas {
   min-height: 0;
+}
+
+.gcode-viewer_overlay {
+  position: absolute;
+  top: 50px;
+  padding: 5px;
+  background-color: transparent;
 }
 
 .gcode-viewer_toolbar-container {
@@ -34,4 +42,29 @@
 .gcode-viewer_toolbar-flex-grow {
   flex: 1;
   margin: 0 5px;
+}
+
+.gcode-viewer_container input[type="file"] {
+  display: none;
+}
+.gcode-viewer_container .custom-file-upload {
+  display: inline-block;
+  cursor: pointer;
+  height: 24px;
+  width: 24px;
+  padding: 5px;
+}
+
+.gcode-viewer_selection-bar {
+  display: flex;
+  flex: 0;
+  padding: 4px;
+  margin: 0px;
+  background: #ebf1f5;
+  align-content: center;
+}
+
+.gcode-viewer_selection-bar li {
+  flex: 0 1 auto;
+  height: 30px;
 }
