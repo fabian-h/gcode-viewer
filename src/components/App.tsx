@@ -34,6 +34,7 @@ import DrawSettingsButton from "./DrawSettings";
 import Statistics from "./Statistics";
 import OctoprintAddDialog from "./octoprint/OctoprintAddDialog";
 import OctoprintOverview from "./octoprint/OctoprintOverview";
+import ProjectionCanvas from "./ProjectionCanvas";
 
 // See https://blueprintjs.com/docs/#core/accessibility.focus-management
 FocusStyleManager.onlyShowFocusOnTabs();
@@ -91,7 +92,7 @@ const App = observer(IProps => {
           </Navbar.Group>
         </Navbar>
       </TopbarContainer>
-
+      {UIStore.activeGCode && <ProjectionCanvas gcode={UIStore.activeGCode} />}
       <ViewerContainer>
         {UIStore.activeGCode && UIStore.activeGCode.live ? (
           <LiveGCodeViewer UIStore={UIStore} />

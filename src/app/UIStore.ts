@@ -19,6 +19,8 @@ import { Instructions, IStatistics } from "./gcode-parser";
 import { ITransform } from "components/GCodeViewer";
 import OctoprintConnection from "./OctoprintConnection";
 
+import { calculateProjection } from "./projections";
+
 export class UIStore {
   @observable
   transform: ITransform = { k: 1, x: 0, y: 0 };
@@ -67,6 +69,7 @@ export class UIStore {
         y: gcode.statistics.y.min || 0,
       });
     }*/
+    if (gcode !== null) calculateProjection(gcode);
     this.activeGCode = gcode;
     this.activeLayer = 1;
   }

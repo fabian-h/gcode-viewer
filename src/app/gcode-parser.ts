@@ -61,7 +61,7 @@ export const COMMANDS = {
   MOVE_WITHOUT_EXTRUSION: 2, // parameters: X,Y
   SET_FEED_RATE: 3, // parameters: F
   RETRACTION: 4,
-  LAYER_CHANGE: 5, // parameters: Z
+  LAYER_CHANGE: 5, // parameters: n, Z
   TOOL_CHANGE: 6
 };
 
@@ -241,6 +241,7 @@ export default class GCodeParser {
                     this.instructions.addInstruction(
                       this.byte_index,
                       COMMANDS.LAYER_CHANGE,
+                      this.current_layer_index,
                       this.prev_z
                     );
                     //this.line_index.push(this.byte_index);
