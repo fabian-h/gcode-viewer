@@ -5,9 +5,10 @@ export function calculateProjection(gcode: IGCode) {
   const { instructions, statistics } = gcode;
   const aspectRatio = (statistics.x.max - statistics.x.min) / statistics.z.max;
 
-  const width = 200;
+  const width = 317;
   const height = Math.floor(width / aspectRatio);
   const image = new Uint8Array(width * height);
+  //image.fill(255);
 
   let x = 0;
   let y = 0;
@@ -16,6 +17,13 @@ export function calculateProjection(gcode: IGCode) {
 
   const max = statistics.x.max;
   const min = statistics.x.min;
+
+  const ymax = statistics.y.max;
+  const ymin = statistics.y.min;
+  const ytotal = ymax - ymin;
+
+  let start = 0;
+  let end = 0;
 
   const t0 = performance.now();
   //console.log(instructions.buffers.length);
@@ -34,7 +42,15 @@ export function calculateProjection(gcode: IGCode) {
         let right = Math.ceil(((f32[j + 1] - min) / (max - min)) * width);
         if (left > right) [left, right] = [right, left];
 
-        for (let k = left; k <= right; k++) image[h * width + k] = 100;
+        start = 255 - ((y - ymin) / ytotal) * 255;
+        end = 255 - ((f32[j + 2] - ymin) / ytotal) * 255;
+        for (let k = left; k <= right; k++) {
+          //image[h * width + k] = 255;
+          image[h * width + k] = Math.max(
+            image[h * width + k],
+            Math.floor(start + (end - start) * ((k - left) / (right - left)))
+          );
+        }
         x = f32[j + 1];
         y = f32[j + 2];
       }

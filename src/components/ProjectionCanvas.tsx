@@ -18,7 +18,7 @@ export default function ProjectionCanvas({ gcode }: IProps) {
     if (context) {
       context.save();
       context.setTransform(1, 0, 0, 1, 0, 0);
-      context.clearRect(0, 0, 300, 300);
+      context.clearRect(0, 0, 500, 500);
       context.restore();
       context.scale(-1, 0);
       // create imageData object
@@ -28,9 +28,9 @@ export default function ProjectionCanvas({ gcode }: IProps) {
       let buffer = new Uint8ClampedArray(width * height * 4);
 
       for (let i = 0; i < image.length; ++i) {
-        buffer[i * 4] = 220 - image[image.length - i];
-        buffer[i * 4 + 1] = 200 - image[image.length - i];
-        buffer[i * 4 + 2] = 200 - image[image.length - i];
+        buffer[i * 4] = 255 - image[image.length - i];
+        buffer[i * 4 + 1] = 255 - image[image.length - i];
+        buffer[i * 4 + 2] = 255 - image[image.length - i];
         buffer[i * 4 + 3] = 255;
       }
       console.log(idata, buffer);
@@ -52,5 +52,5 @@ export default function ProjectionCanvas({ gcode }: IProps) {
       if (canvas.current) setContext(canvas.current.getContext("2d"));
     }
   });
-  return <canvas width="250" height="200" ref={canvas}></canvas>;
+  return <canvas width="500" height="500" ref={canvas}></canvas>;
 }
