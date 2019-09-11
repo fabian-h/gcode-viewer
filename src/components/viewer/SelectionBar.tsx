@@ -3,14 +3,16 @@ import * as React from "react";
 import { Button, Icon } from "@blueprintjs/core";
 
 import { IGCode } from "app/UIStore";
+import { Machine } from "xstate";
 import { uploadGCodeFiles } from "app/file-upload";
 
 interface IProps {
   gcodes: IGCode[];
   addGCode: (gcode: IGCode) => void;
+  setCurentGCodeIndex: (index: number) => void;
 }
 
-export default ({ gcodes, addGCode }: IProps) => {
+const SelectionBar = ({ gcodes, addGCode, setCurentGCodeIndex }: IProps) => {
   async function handleFileUpload(event: React.ChangeEvent<HTMLInputElement>) {
     if (event.target.files) {
       console.log(event.target.files);
@@ -21,9 +23,14 @@ export default ({ gcodes, addGCode }: IProps) => {
 
   return (
     <div className="gcode-viewer_selection-bar">
-      {gcodes.map(gcode => {
+      {gcodes.map((gcode, index) => {
         return (
-          <Button intent="primary" className="gcode-viewer_gcode">
+          <Button
+            key={index}
+            intent="primary"
+            className="gcode-viewer_gcode"
+            onClick={() => setCurentGCodeIndex(index)}
+          >
             {gcode.name}
           </Button>
         );
@@ -36,3 +43,4 @@ export default ({ gcodes, addGCode }: IProps) => {
     </div>
   );
 };
+export default SelectionBar;

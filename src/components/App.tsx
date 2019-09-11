@@ -112,10 +112,7 @@ const App = observer(() => {
         ) : (
           <StaticGCodeViewer UIStore={UIStore} drawSettings={drawSettings} />
         )*/}
-          <GCodeViewerUI
-            GCode={UIStore.activeGCode}
-            drawSettings={drawSettings}
-          />
+          <GCodeViewerUI drawSettings={drawSettings} />
           <OctoprintOverview />
         </ViewerContainer>
       </GridContainer>

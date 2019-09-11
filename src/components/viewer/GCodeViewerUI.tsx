@@ -3,66 +3,83 @@ import "./GCodeViewer.css";
 import * as React from "react";
 
 import { Button, NumericInput } from "@blueprintjs/core";
-import { GCodeContext, useGCodeContext } from "app/GCodeProvider";
 import GCodeViewer, { ITransform } from "components/GCodeViewer";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useReducer, useState } from "react";
 
 import { GCodeDropzone } from "components/GCodeDropzone";
 import { IDrawSettings } from "app/DrawSettings";
-import { IGCode } from "app/UIStore";
 import LayerSelectionSlider from "./LayerSelectionSlider";
+import { Machine } from "xstate";
 import SelectionBar from "./SelectionBar";
+import produce from "immer";
+import { useGCodeContext } from "app/GCodeProvider";
+import { useMachine } from "@xstate/react";
 
-/*
-const ContainerDiv = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-`;
+interface UISchema {
+  states: {
+    empty: {};
+    active: {};
+  };
+}
 
-const StyledGCodeViewer = styled(GCodeViewer)`
-  min-height: 0;
-`;
+interface UIContext {}
 
-const ToolbarDiv = styled.div`
-  flex: 0 0 auto;
-  padding: 5px;
-  display: flex;
-  flex-direction: row;
-`;
+type UIEvent = { type: "ADD" };
 
-const FlexItemButton = styled(Button)`
-  flex: 0 0 auto;
-  margin: 0 5px;
-`;
+const UIMachine = Machine<UIContext, UISchema, UIEvent>({
+  id: "ui",
 
-const FlexItemContainer = styled.div`
-  flex: 0 0 auto;
-  margin: 0 5px;
-`;
+  states: {
+    empty: {},
+    active: {}
+  }
+});
 
-const FlexItemContainerGrow = styled.div`
-  flex: 1;
-  margin: 0 5px;
-`;*/
+function currentLayerReducer(
+  state: number[],
+  action: { index: number; layer: number }
+) {
+  var rv = produce(state, draft => {
+    draft[action.index] = action.layer;
+  });
+  console.log("reducer", state, rv);
+  return rv;
+}
+
+function useCurrentLayer(): [
+  (index: number) => number,
+  (index: number, layer: number) => void
+] {
+  const [currentLayers, setCurrentLayers] = useReducer(currentLayerReducer, []);
+  const getCurrentLayer = (index: number) =>
+    currentLayers[index] ? currentLayers[index] : 1;
+  const setCurrentLayer = (index: number, layer: number) => {
+    console.log("set", index, layer);
+    setCurrentLayers({ index, layer });
+  };
+  return [getCurrentLayer, setCurrentLayer];
+}
 
 interface IProps {
-  GCode: IGCode | null;
   drawSettings: IDrawSettings;
 }
 
-export default ({ GCode, drawSettings }: IProps) => {
-  const [currentLayer, setCurrentLayer] = useState<number>(1);
+const GCodeViewerUI = ({ drawSettings }: IProps) => {
+  const [currentState, send] = useMachine(UIMachine);
+
+  //const [currentLayer, setCurrentLayer] = useState<number>(1);
+  const [currentLayers, setCurrentLayer] = useCurrentLayer();
   const [transform, setTransform] = useState<ITransform>({ k: 1, x: 0, y: 0 });
   const [width, setWidth] = useState<number>(0);
   const [height, setHeight] = useState<number>(0);
+  const [currentGCodeIndex, setCurentGCodeIndex] = useState<number>(0);
 
   const GCodeStore = useGCodeContext();
-  console.log("store", GCodeStore);
 
+  const GCode = GCodeStore.gcodes[currentGCodeIndex];
+  console.log("draw", currentLayers, currentGCodeIndex);
   useEffect(() => {
-    if (GCode !== null) {
+    if (GCode !== undefined) {
       const initialTransform = calculateTransfromFromCoordinates(
         GCode.statistics.x.min,
         GCode.statistics.x.max,
@@ -76,13 +93,17 @@ export default ({ GCode, drawSettings }: IProps) => {
     }
   }, [GCode, width, height]);
 
-  if (GCode === null) return <GCodeDropzone />;
+  if (GCode === undefined) return <GCodeDropzone />;
 
   return (
     <div className="gcode-viewer_container">
-      <SelectionBar gcodes={GCodeStore.gcodes} addGCode={GCodeStore.addGCode} />
+      <SelectionBar
+        gcodes={GCodeStore.gcodes}
+        addGCode={GCodeStore.addGCode}
+        setCurentGCodeIndex={setCurentGCodeIndex}
+      />
       <GCodeViewer
-        currentLayer={currentLayer}
+        currentLayer={currentLayers(currentGCodeIndex)}
         activeGCode={GCode}
         transform={transform}
         setTransform={setTransform}
@@ -91,9 +112,10 @@ export default ({ GCode, drawSettings }: IProps) => {
         setHeight={setHeight}
       />
       <div className="gcode-viewer_overlay">
-        Layer {currentLayer}
+        Layer {currentLayers(currentGCodeIndex)}
         <br />
-        Layer height: {GCode.layerHeights[currentLayer].toFixed(2)} mm
+        Layer height:{" "}
+        {GCode.layerHeights[currentLayers(currentGCodeIndex)].toFixed(2)} mm
       </div>
       <div className="gcode-viewer_toolbar-container">
         <Button
@@ -106,23 +128,30 @@ export default ({ GCode, drawSettings }: IProps) => {
 
         <div className="gcode-viewer_toolbar-flex-grow">
           <LayerSelectionSlider
-            currentLayer={currentLayer}
+            currentLayer={currentLayers(currentGCodeIndex)}
             numberOfLayers={GCode.numberOfLayers}
-            setCurrentLayer={setCurrentLayer}
+            setCurrentLayer={layer => {
+              console.log("slider", currentGCodeIndex, layer);
+              setCurrentLayer(currentGCodeIndex, layer);
+            }}
           />
         </div>
         <div className="gcode-viewer_toolbar-layer-input">
           <NumericInput
             min={0}
             max={GCode.numberOfLayers}
-            onValueChange={value => setCurrentLayer(value)}
-            value={currentLayer}
+            onValueChange={layer => {
+              console.log("numeric", currentGCodeIndex, layer);
+              setCurrentLayer(currentGCodeIndex, layer);
+            }}
+            value={currentLayers(currentGCodeIndex)}
           />
         </div>
       </div>
     </div>
   );
 };
+export default GCodeViewerUI;
 
 function calculateTransfromFromCoordinates(
   xmin: number,
