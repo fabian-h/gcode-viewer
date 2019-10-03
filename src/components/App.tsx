@@ -64,12 +64,6 @@ const ViewerContainer = styled.div`
   display: flex;
 `;
 
-const ToolContainer = styled.div`
-  grid-column: 1/3;
-  grid-row: 3;
-  padding: 0 20px 0 20px;
-`;
-
 const SidebarContainer = styled.div`
   grid-column: 1/2;
   grid-row: 2;

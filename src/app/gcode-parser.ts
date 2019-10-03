@@ -298,13 +298,13 @@ export default class GCodeParser {
                     x_coord = this.field_values[X];
                   else x_coord = this.prev_x + this.field_values[X];
                   if (
-                    command == COMMANDS.MOVE_WITH_EXTRUSION &&
+                    command === COMMANDS.MOVE_WITH_EXTRUSION &&
                     this.prev_z !== 0 &&
                     x_coord > this.statistics.x.max
                   )
                     this.statistics.x.max = x_coord;
                   if (
-                    command == COMMANDS.MOVE_WITH_EXTRUSION &&
+                    command === COMMANDS.MOVE_WITH_EXTRUSION &&
                     this.prev_z !== 0 &&
                     x_coord < this.statistics.x.min
                   )
@@ -317,13 +317,13 @@ export default class GCodeParser {
                     y_coord = this.field_values[Y];
                   else y_coord = this.prev_y + this.field_values[Y];
                   if (
-                    command == COMMANDS.MOVE_WITH_EXTRUSION &&
+                    command === COMMANDS.MOVE_WITH_EXTRUSION &&
                     this.prev_z !== 0 &&
                     y_coord > this.statistics.y.max
                   )
                     this.statistics.y.max = y_coord;
                   if (
-                    command == COMMANDS.MOVE_WITH_EXTRUSION &&
+                    command === COMMANDS.MOVE_WITH_EXTRUSION &&
                     this.prev_z !== 0 &&
                     y_coord < this.statistics.y.min
                   )
@@ -392,7 +392,7 @@ export default class GCodeParser {
             this.field_values[T]
           );
           this.current_tool = this.field_values[T];
-          if (this.statistics.tools[this.current_tool] == undefined)
+          if (this.statistics.tools[this.current_tool] === undefined)
             this.statistics.tools[this.current_tool] = { extrusion: 0 };
         }
 

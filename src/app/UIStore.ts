@@ -15,9 +15,8 @@ limitations under the License.
 */
 
 import { IStatistics, Instructions } from "./gcode-parser";
-import { action, computed, observable } from "mobx";
+import { action, observable } from "mobx";
 
-import { ITransform } from "components/GCodeViewer";
 import OctoprintConnection from "./OctoprintConnection";
 
 export class UIStore {

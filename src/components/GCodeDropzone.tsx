@@ -14,13 +14,13 @@ See the License for the specific language governing permissions and
 limitations under the License. 
 */
 
-import { GCodeContext, useGCodeContext } from "app/GCodeProvider";
-import React, { useCallback, useContext } from "react";
+import React, { useCallback } from "react";
 
 import UIStore from "app/UIStore";
 import styled from "styled-components/macro";
 import { uploadGCodeFiles } from "app/file-upload";
 import { useDropzone } from "react-dropzone";
+import { useGCodeContext } from "app/GCodeProvider";
 
 const DropzoneContainer = styled.div`
   flex: 1;

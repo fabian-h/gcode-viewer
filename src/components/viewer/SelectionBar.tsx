@@ -3,7 +3,6 @@ import * as React from "react";
 import { Button, Icon } from "@blueprintjs/core";
 
 import { IGCode } from "app/UIStore";
-import { Machine } from "xstate";
 import { uploadGCodeFiles } from "app/file-upload";
 
 interface IProps {

@@ -5,6 +5,7 @@
   "private": true,
   "dependencies": {
     "@xstate/react": "^0.7.0",
+    "babel-plugin-macros": "^2.6.1",
     "d3": "^5.9.7",
     "formik": "^1.5.8",
     "gh-pages": "^2.0.1",

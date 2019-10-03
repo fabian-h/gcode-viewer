@@ -8,6 +8,7 @@ import { useEffect, useReducer, useState } from "react";
 
 import { GCodeDropzone } from "components/GCodeDropzone";
 import { IDrawSettings } from "app/DrawSettings";
+import { IGCode } from "app/UIStore";
 import LayerSelectionSlider from "./LayerSelectionSlider";
 import { Machine } from "xstate";
 import SelectionBar from "./SelectionBar";
@@ -27,11 +28,21 @@ interface UIContext {}
 type UIEvent = { type: "ADD" };
 
 const UIMachine = Machine<UIContext, UISchema, UIEvent>({
-  id: "ui",
-
+  id: "gcode_ui",
+  strict: true,
+  initial: "empty",
+  context: {},
   states: {
-    empty: {},
-    active: {}
+    empty: {
+      on: {
+        ADD: "active"
+      }
+    },
+    active: {
+      on: {
+        ADD: "active"
+      }
+    }
   }
 });
 
@@ -42,7 +53,6 @@ function currentLayerReducer(
   var rv = produce(state, draft => {
     draft[action.index] = action.layer;
   });
-  console.log("reducer", state, rv);
   return rv;
 }
 
@@ -65,7 +75,7 @@ interface IProps {
 }
 
 const GCodeViewerUI = ({ drawSettings }: IProps) => {
-  const [currentState, send] = useMachine(UIMachine);
+  const [currentState, send] = useMachine(UIMachine, { devTools: true });
 
   //const [currentLayer, setCurrentLayer] = useState<number>(1);
   const [currentLayers, setCurrentLayer] = useCurrentLayer();
@@ -77,7 +87,6 @@ const GCodeViewerUI = ({ drawSettings }: IProps) => {
   const GCodeStore = useGCodeContext();
 
   const GCode = GCodeStore.gcodes[currentGCodeIndex];
-  console.log("draw", currentLayers, currentGCodeIndex);
   useEffect(() => {
     if (GCode !== undefined) {
       const initialTransform = calculateTransfromFromCoordinates(
@@ -93,15 +102,23 @@ const GCodeViewerUI = ({ drawSettings }: IProps) => {
     }
   }, [GCode, width, height]);
 
-  if (GCode === undefined) return <GCodeDropzone />;
+  if (GCode === undefined)
+    return <GCodeDropzone onFileLoad={() => send("ADD")} />;
 
   return (
     <div className="gcode-viewer_container">
       <SelectionBar
         gcodes={GCodeStore.gcodes}
-        addGCode={GCodeStore.addGCode}
-        setCurentGCodeIndex={setCurentGCodeIndex}
+        addGCode={(gcode: IGCode) => {
+          console.log("ADDDD");
+          send({ type: "ADD" });
+        }}
+        setCurentGCodeIndex={() => {
+          console.log("ADDDD222");
+          send({ type: "ADD" });
+        }}
       />
+      {currentState.matches("active") && <p>Active</p>}
       <GCodeViewer
         currentLayer={currentLayers(currentGCodeIndex)}
         activeGCode={GCode}

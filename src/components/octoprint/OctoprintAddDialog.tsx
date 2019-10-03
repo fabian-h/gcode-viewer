@@ -26,8 +26,8 @@ import {
   InputGroup
 } from "@blueprintjs/core";
 import { ErrorMessage, Field, FieldProps, Form, Formik } from "formik";
-import { Machine, interpret } from "xstate";
 
+import { Machine } from "xstate";
 import OctoprintStore from "app/OctoprintStore";
 import { observer } from "mobx-react-lite";
 import styled from "styled-components/macro";

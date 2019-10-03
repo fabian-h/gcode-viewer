@@ -1,8 +1,8 @@
 import { Button, Card } from "@blueprintjs/core";
-import OctoprintStore, { IOctoprintServer } from "app/OctoprintStore";
 
 import GCodeParser from "app/gcode-parser";
 import OctoprintConnection from "app/OctoprintConnection";
+import OctoprintStore from "app/OctoprintStore";
 import React from "react";
 import UIStore from "app/UIStore";
 import { observer } from "mobx-react-lite";

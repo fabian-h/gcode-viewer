@@ -14,14 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License. 
 */
 
-import {
-  observable,
-  action,
-  computed,
-  reaction,
-  autorun,
-  IReactionPublic
-} from "mobx";
+import { action, autorun, observable } from "mobx";
+
 import OctoprintConnection from "./OctoprintConnection";
 
 class OctoprintStore {
@@ -29,7 +23,7 @@ class OctoprintStore {
     this.servers = this.restore("octoprint_servers", []).map((x: any) => ({
       config: x
     }));
-    autorun(reaction => {
+    autorun(() => {
       this.servers = this.servers.map(({ config }) => ({
         config: config,
         connection: new OctoprintConnection(
