@@ -15,7 +15,7 @@
     "react-dropzone": "^10.1.6",
     "react-scripts": "3.0.1",
     "styled-components": "^4.3.2",
-    "three": "^0.106.2",
+    "three": "^0.125.0",
     "xstate": "^4.6.7",
     "yup": "^0.27.0"
   },
